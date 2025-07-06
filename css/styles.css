@@ -1,0 +1,115 @@
+@font-face {
+    font-family: 'Roboto';
+    src: url(/fonts/Roboto/static/Roboto-Black.ttf) format('truetype');
+    font-weight: 900;
+}
+
+@font-face {
+    font-family: 'Oswald'; 
+    src: url(/fonts/Oswald/static/Oswald-Bold.ttf) format('truetype');
+    font-weight: 700;
+}
+
+@font-face {
+    font-family: 'Montserrat';
+    src: url(/fonts/Montserrat/static/Montserrat-Medium.ttf) format('truetype');
+    font-weight: 500;
+}
+
+body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.nav {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background-color: #1F2833;
+    height: 8rem;
+}
+
+.dark-mode__button {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    min-width: 4rem;
+    min-height: 2rem;
+    border-radius: 100px;
+    box-sizing: border-box;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.mode-icon {
+    width: 3rem;
+}
+
+h1 {
+    font-size: 50px;
+    color: #fff;
+    text-transform: uppercase;
+    font-family: Roboto;
+}
+
+.icon {
+    width: 4rem;
+}
+
+.container-wrapped {
+    height: 100%; 
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 10fr 1fr;
+}
+
+.container-left-aside {
+    background-color: #f4f4f5;
+}
+
+.main-container {
+    display: grid;
+    grid-template-rows: 9fr 2fr;
+    background-color: #fefdfc;
+}
+
+.options-container {
+    display: flex;
+    justify-content: end;
+    display: relative;
+}
+
+.options-icon {
+    width: 3rem;
+}
+
+.options-button {
+    margin-right: 3rem;
+    background-color: transparent;
+    border: none;
+}
+
+.container-right-aside {
+    background-color: #f4f4f5;
+}
+
+footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #1F2833;
+    color: #fff;
+    font-family: sans-serif;
+    font-size: 1em;
+    min-height: 8rem;
+}
+
+.footer-container {  
+    display: flex;
+    justify-content: space-around;
+    align-items: center;  
+    min-width: 38rem;   
+}
