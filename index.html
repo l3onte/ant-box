@@ -36,11 +36,86 @@
 
         <main class="main-container">
             <div class="table-container">
+                <div class="table__nav">
+                    <button class="table__button">New Movement</button>
+                    <button class="table__button">New Buget</button>
+                    <button class="sort__button"><img src="assets/iconos/sort.png" alt="sort icon" class="sort-icon"></button>
+                    <button class="sort__button"><img src="assets/iconos/az.png" alt="sort alph icon" class="sort-icon"></button>
+                    <button class="sort__button"><img src="assets/iconos/filter.png" alt="filter icon" class="sort-icon"></button>
+                    <input type="search" class="table__search" placeholder="search" id="table__search">
+                </div>
                 <table>
-
+                    <thead>
+                        <tr>
+                            <th>id</th>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th>Type</th>
+                            <th>Category</th>
+                            <th>Amount</th>
+                            <th>Balance</th>
+                            <th>Options</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>12-04-06</td>
+                            <td>Beca Gringos</td>
+                            <td class="movement-type-field"><strong class="movement-type expense">Gasto</strong></td>
+                            <td>Beca</td>
+                            <td>700C$</td>
+                            <td>10000C$</td>
+                            <td>
+                                <button class="actions-button">☰</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>12-04-06</td>
+                            <td>Beca Gringos</td>
+                            <td class="movement-type-field"><strong class="movement-type">Ingreso</strong></td>
+                            <td>Beca</td>
+                            <td>700C$</td>
+                            <td>10000C$</td>
+                            <td>
+                                <button class="actions-button">☰</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>12-04-06</td>
+                            <td>Beca Gringos</td>
+                            <td class="movement-type-field"><strong class="movement-type expense">Gasto</strong></td>
+                            <td>Beca</td>
+                            <td>700C$</td>
+                            <td>10000C$</td>
+                            <td>
+                                <button class="actions-button">☰</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>12-04-06</td>
+                            <td>Beca Gringos</td>
+                            <td class="movement-type-field"><strong class="movement-type">Ingreso</strong></td>
+                            <td>Beca</td>
+                            <td>700C$</td>
+                            <td>10000C$</td>
+                            <td>
+                                <button class="actions-button">☰</button>
+                            </td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
             <div class="options-container">
+                <div class="options">
+                    <!-- 
+                        <a href="" class="options__buttons revenue--button"><img src="assets/iconos/revenue.png" alt="" class="options__icons"></a>
+                        <a href="" class="options__buttons cash-flow--button"><img src="assets/iconos/cash-flow.png" alt="" class="options__icons"></a>
+                    -->
+                </div>
                 <button class="options-button"><img src="assets/iconos/setting.png" alt="setting-icon" class="options-icon"></button>
             </div>
         </main>
