@@ -1,13 +1,16 @@
 const api = 'https://686770e4e3fefb261edeaa36.mockapi.io';
+async function validation(response) {
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Error ${response.status}: ${errorText}`);
+    }
+}
 
 export async function getMovements() {
     try {
         const response = await fetch(`${api}/movement`);
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Error ${response.status}: ${errorText}`);
-        }
+        validation(response);
 
         const data = await response.json();
         return data;
@@ -24,10 +27,7 @@ export async function newMovement(data) {
             body: JSON.stringify(data)
         });
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Error ${response.status}: ${errorText}`);
-        }
+        validation(response);
 
         const result = await response.json();
         console.log(result);
@@ -42,10 +42,7 @@ export async function deleteMovement(id) {
             method: 'DELETE'
         });
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Error ${response.status}: ${errorText}`);
-        }
+        validation(response);
     } catch (error) {
         console.log(error);
     }
@@ -59,10 +56,36 @@ export async function updateMovement(id, change) {
             body: JSON.stringify(change)
         });
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Error ${response.status}: ${errorText}`);
-        }
+        validation(response);
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+export async function newBuget(newBuget) {
+    try {
+        const response = await fetch(`${api}/budgets`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json' },
+            body: JSON.stringify(newBuget)
+        });
+
+        validation(response);
+        
+        alert("New budget added");
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+export async function getBugets() {
+    try {
+        const response = await fetch(`${api}/budgets`);
+
+        validation(response);
+        const data = await response.json();
+        return data;
+
     } catch (error) {
         console.log(error);
     }

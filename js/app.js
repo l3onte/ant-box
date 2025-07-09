@@ -1,8 +1,19 @@
 import * as ui from './ui.js';
 
 ui.showMovements();
-ui.openBudgetModal();
 ui.openMovementModal();
+ui.openBudgetModal();
 ui.closeModal();
+ui.extractBudgetData();
+
 ui.showOptions();
 ui.openOptions();
+ui.sortByid();
+ui.sortByAlph();
+ui.filters();
+
+ui.filterByDate();
+ui.filterByExpense();
+ui.filterByIncrease();
+ui.filterByCategory();
+ui.search();
