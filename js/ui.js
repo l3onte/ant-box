@@ -101,13 +101,53 @@ export function showOptions() {
     });
 };
 
-export async function showMovements() {
+let sortByAsc = true;
+
+export function sortByid() {
+    document.querySelector('.sort-by-id').addEventListener('click', () => {
+        showMovements("SortByID", sortByAsc);
+        sortByAsc = !sortByAsc;
+    });
+}
+
+export function sortByAlph() {
+    document.querySelector('.sort-by-alph').addEventListener('click', () => {
+        showMovements("SortByAlph", sortByAsc);
+        sortByAsc = !sortByAsc;
+    });
+}
+
+function sortBy(sortBy, asc, data) {
+    switch (sortBy) {
+        case "SortByID":
+            data.sort((previus, current) =>  {
+                return asc
+                    ? Number(previus.id) - Number(current.id)
+                    : Number(current.id) - Number(previus.id);
+            });
+        break;
+
+        case "SortByAlph": 
+            data.sort((previus, current) => {
+                return asc
+                    ? previus.description.localeCompare(current.description)
+                    : current.description.localeCompare(previus.description);
+            });
+        break;
+    }
+}
+
+export async function showMovements(sort = "", asc = true) {
     const tbody = document.querySelector('tbody');
     tbody.innerHTML = ``;
 
     const data = await api.getMovements();
 
-    data.forEach((movement, index) => {
+    sortBy(sort, asc, data)
+
+    balance = 0;
+
+    data.forEach((movement) => {
         const row = document.createElement('tr');
 
         if (movement.type === 'expense') {
@@ -124,7 +164,7 @@ export async function showMovements() {
         }
 
         row.innerHTML = `
-            <td>${index + 1}</td>
+            <td>${movement.id}</td>
             <td>${movement.date}</td>
             <td>${movement.description}</td>
             <td class="movement-type-field">
