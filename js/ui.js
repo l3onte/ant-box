@@ -5,6 +5,11 @@ let modal = document.getElementById('modal-principal');
 const modalTitle = document.querySelector('.modal__title');
 const modalInputs = document.querySelector('.modal__inputs');
 const modalFooter = document.querySelector('.modal__footer');
+const dateFilter = document.getElementById('date-filter-input');
+const expenseFilter = document.getElementById('expense-filter');
+const increceFilter = document.getElementById('increase-filter');
+const categoryFilter = document.getElementById('category-filter__input');
+const searchInput = document.getElementById('table__search');
 
 function modifyMovementModal() {
     modalTitle.innerHTML = `
@@ -137,13 +142,56 @@ function sortBy(sortBy, asc, data) {
     }
 }
 
-export async function showMovements(sort = "", asc = true) {
+function filterBy(filter, filterData, data) {
+    switch(filter) {
+        case "date":
+            return data.filter(dato => dato.date === filterData);
+        break;
+        case "expense":
+            return data.filter(dato => dato.type === filterData);
+        break;
+        case "increase":
+            return data.filter(dato => dato.type === filterData);
+        break;
+        case "category":
+            return data.filter(dato => dato.category === filterData);
+        break;
+    };
+}
+
+function filterBySearch(term, data) {
+    const lowerTerm = term.toLowerCase();
+
+    return data.filter(movement => {
+
+        return (
+            movement.date.includes(lowerTerm) ||
+            movement.description.toLowerCase().includes(lowerTerm) ||
+            movement.type.toLowerCase().includes(lowerTerm) || 
+            movement.category.toLowerCase().includes(lowerTerm) ||
+            movement.amount.toString().includes(lowerTerm)
+        );
+
+    }); 
+}
+
+export async function showMovements(sort = "", asc = true, filter = "", filterDate = "", search = "") {
     const tbody = document.querySelector('tbody');
     tbody.innerHTML = ``;
 
-    const data = await api.getMovements();
+    let data = await api.getMovements();
 
-    sortBy(sort, asc, data)
+    if (sort !== "") {
+        sortBy(sort, asc, data)
+    }
+
+    if (filter !== "") {
+       data = filterBy(filter, filterDate, data);
+    }
+
+    if (search !== "") {
+        data = filterBySearch(search, data);
+    }
 
     balance = 0;
 
@@ -294,4 +342,51 @@ export function openOptions() {
             extractEditMovement(id);
         }
     });
+}
+
+export function filters() {
+    document.querySelector('.filter--button').addEventListener('click', () => {
+        document.querySelector('.dropdown-filters').classList.toggle('active');
+    });
+}
+
+export function filterByDate() {
+    dateFilter.addEventListener('change', () => {
+        const date = dateFilter.value;
+        showMovements("", "", "date", date);
+    });
+}
+
+export function filterByExpense() {
+    expenseFilter.addEventListener('change', () => {
+        if (expenseFilter.checked) {
+            showMovements("", "", "expense", "expense");
+        } else {
+            showMovements();
+        }
+    });
+}
+
+export function filterByIncrease() {
+    increceFilter.addEventListener('change', () => {
+        if (increceFilter.checked) {
+            showMovements("", "", "increase", "increce");
+        } else {
+            showMovements();
+        }
+    });
+}
+
+export function filterByCategory() {
+    categoryFilter.addEventListener('change', () => {
+        const date = categoryFilter.value;
+        showMovements("", "", "category", date);
+    });
+}
+
+export function search() {
+    searchInput.addEventListener('input', (event) => {
+        const term = event.target.value;
+        showMovements("", "", "", "", term);
+    })
 }

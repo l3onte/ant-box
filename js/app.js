@@ -9,3 +9,10 @@ ui.showOptions();
 ui.openOptions();
 ui.sortByid();
 ui.sortByAlph();
+ui.filters();
+
+ui.filterByDate();
+ui.filterByExpense();
+ui.filterByIncrease();
+ui.filterByCategory();
+ui.search();
