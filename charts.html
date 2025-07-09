@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Leonte Joel Canales Berrios">
+    <meta name="keywords" content="Financa, Smart, Manager, Money, Stats">
+    <title>Smart Finance Manager</title>
+    <link rel="icon" href="/assets/favicon/economics.png">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <nav class="nav">
+            <div class="dark-mode-container">
+                <button class="dark-mode__button">
+                    <div class="">
+                        <img src="assets/iconos/day-mode.png" alt="mode-icon" title="Screen Mode Icon" aria-label="Screen Mode Icon" class="mode-icon">
+                    </div>
+                </button>
+            </div>
+
+            <div class="title-container">
+                <h1>Smart Finance Manager</h1>
+            </div>
+
+            <div class="user-container">
+                <img src="assets/iconos/user.png" alt="user-icon" class="icon" title="User Icon" aria-label="User Icon">
+            </div>
+        </nav>
+    </header>
+
+    <div class="container-wrapped">
+        <aside class="container-left-aside">
+        </aside>
+
+        <main class="main-container">
+            <div class="chart-container">
+                <canvas id="movementChart"></canvas>
+            </div>
+
+            <div class="options-container">
+                <div class="options">
+                    <a href="#" class="options__buttons revenue--button"><img src="assets/iconos/revenue.png" alt="" class="options__icons"></a>
+                    <a href="index.html" class="options__buttons cash-flow--button"><img src="assets/iconos/cash-flow.png" alt="" class="options__icons"></a>
+                </div>
+                <div class="settings-container">
+                    <button class="options-button"><img src="assets/iconos/setting.png" alt="setting-icon" class="options-icon"></button>
+                </div>
+            </div>
+        </main>
+
+        <aside class="container-right-aside">
+        </aside>
+    </div>
+
+    <footer>
+        <div class="footer-container">
+            <a href="https://github.com/l3onte/smart-finance-manager" target="_blank"><img src="assets/iconos/github.png" alt="github-icon" class="icon"></a>
+            <p>© 2025 Smart Finance Manager by Leonte Canales. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module" src="js/charts.js"></script>
+</body>
+</html>
