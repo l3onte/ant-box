@@ -528,3 +528,10 @@ footer {
 .hidden {
   display: none;
 }
+
+.chart-container {
+  width: 100%;
+  max-width: 60%;
+  margin: 0 auto;
+  padding: 2rem;
+}
