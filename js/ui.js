@@ -11,6 +11,8 @@ const increceFilter = document.getElementById('increase-filter');
 const categoryFilter = document.getElementById('category-filter__input');
 const searchInput = document.getElementById('table__search');
 
+const saveBuget = document.getElementById('save-budget');
+
 function modifyMovementModal() {
     modalTitle.innerHTML = `
         <h5>New Movement</h5>
@@ -61,6 +63,19 @@ function modifyBudgetModal() {
     modalInputs.innerHTML = `
         <select name="category" id="category" class="modal__input">
             <option selected>Select the category</option>
+            <option value="food">Food</option>
+            <option value="transport">Transport</option>
+            <option value="rent">Rent</option>
+            <option value="entertainment">Entertainment</option>
+            <option value="health">Health</option>
+            <option value="education">Education</option>
+            <option value="subscriptions">Subscription</option>
+            <option value="salary">Salary</option>
+            <option value="freelance">Freelance</option>
+            <option value="gifts">Gifts</option>
+            <option value="investments">Investments</option>
+            <option value="refunds">Refunds</option>
+            <option value="other">Other</option>
         </select>
         <label for="amount" class="modal__label">Amount</label>
         <input type="number" placeholder="Write the amount" id="amount" class="modal__input">
@@ -176,10 +191,15 @@ function filterBySearch(term, data) {
 }
 
 export async function showMovements(sort = "", asc = true, filter = "", filterDate = "", search = "") {
+    const budgets = await api.getBugets();
     const tbody = document.querySelector('tbody');
     tbody.innerHTML = ``;
 
     let data = await api.getMovements();
+    let budgetAmount = {};
+
+
+    console.log(budgets);
 
     if (sort !== "") {
         sortBy(sort, asc, data)
@@ -192,6 +212,30 @@ export async function showMovements(sort = "", asc = true, filter = "", filterDa
     if (search !== "") {
         data = filterBySearch(search, data);
     }
+
+    data.forEach(element => {
+        budgets.forEach(budget => {
+            if (element.category === budget.category) {
+                if (!budgetAmount[element.category]) {
+                    budgetAmount[element.category] = 0;
+                }
+
+                budgetAmount[element.category] += element.amount;
+            }
+        });
+    });
+
+    for (const [key, value] of Object.entries(budgetAmount)) {
+        let encontrado = false;
+        budgets.forEach(budget => {
+            if (value > budget.amount && encontrado === false) {
+                alert(`Your superpassed the budget for ${key}`);
+                encontrado = true;
+            }
+        });
+    }
+
+    console.log(budgetAmount);
 
     balance = 0;
 
@@ -389,4 +433,23 @@ export function search() {
         const term = event.target.value;
         showMovements("", "", "", "", term);
     })
+}
+
+export function extractBudgetData() {
+    modal.addEventListener('click', async (event) => {
+        if (event.target && event.target.id === "save-budget") {
+            const category = document.getElementById('category').value;
+            const amount = document.getElementById('amount').value;
+            const month = document.getElementById('month').value;
+
+            let newBuget = {
+                category,
+                amount,
+                month
+            };
+
+            await api.newBuget(newBuget);
+            modal.close();
+        };
+    });
 }
