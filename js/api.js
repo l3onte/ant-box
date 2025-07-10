@@ -1,4 +1,5 @@
 const api = 'https://686770e4e3fefb261edeaa36.mockapi.io';
+
 async function validation(response) {
     if (!response.ok) {
         const errorText = await response.text();
@@ -71,8 +72,6 @@ export async function newBuget(newBuget) {
         });
 
         validation(response);
-        
-        alert("New budget added");
     } catch (error) {
         console.log(error);
     }
@@ -87,6 +86,33 @@ export async function getBugets() {
         return data;
 
     } catch (error) {
+        console.log(error);
+    }
+}
+
+export async function deleteBudget(id) {
+    try {
+        const response = await fetch(`${api}/budgets/${id}`, {
+            method: 'DELETE',            
+        });
+
+        validation(response);
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+export async function updateBudget(id, change) {
+    try {
+        const response = await fetch(`${api}/budgets/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json'},
+            body: JSON.stringify(change)
+        });
+
+        validation(response);
+        alert("Update");
+    } catch (error) {   
         console.log(error);
     }
 }
