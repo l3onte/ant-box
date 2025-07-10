@@ -36,12 +36,10 @@
 
         <main class="main-container">
             <div class="table-container">
-                <div class="table__nav">
-                    <button class="table__button" id="new-movement__button" value="movement">New Movement</button>
-                    
+                <div class="table__nav nav--budget">
+                    <button class="table__button" id="new-budget__button" value="budget">New Buget</button>
                     <button class="sort__button sort-by-id"><img src="assets/iconos/sort.png" alt="sort icon" class="sort-icon"></button>
                     <button class="sort__button sort-by-alph"><img src="assets/iconos/az.png" alt="sort alph icon" class="sort-icon"></button>
-                    <button class="sort__button filter--button"><img src="assets/iconos/filter.png" alt="filter icon" class="sort-icon"></button>
 
                     <div class="dropdown-filters">
                         <p class="dropdown-filters__title">Filter By: </p>
@@ -88,24 +86,21 @@
                     <thead>
                         <tr>
                             <th>id</th>
-                            <th>Date</th>
-                            <th>Description</th>
-                            <th>Type</th>
+                            <th>Month</th>
                             <th>Category</th>
                             <th>Amount</th>
-                            <th>Balance</th>
                             <th>Options</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="tbody-budget">
                     </tbody>
                 </table>
             </div>
             <div class="options-container">
                 <div class="options">
                     <a href="charts.html" class="options__buttons revenue--button"><img src="assets/iconos/revenue.png" alt="" class="options__icons"></a>
-                    <a href="budgets.html" class="options__buttons cash-flow--button"><img src="assets/iconos/earning.png" alt="" class="options__icons"></a>
-                    <a href="#" class="options__buttons cash-flow--button"><img src="assets/iconos/cash-flow.png" alt="" class="options__icons"></a>
+                    <a href="index.html" class="options__buttons cash-flow--button"><img src="assets/iconos/cash-flow.png" alt="" class="options__icons"></a>
+                    <a href="#" class="options__buttons cash-flow--button"><img src="assets/iconos/earning.png" alt="" class="options__icons"></a>
                 </div>
                 <div class="settings-container">
                     <button class="options-button"><img src="assets/iconos/setting.png" alt="setting-icon" class="options-icon"></button>
@@ -140,6 +135,6 @@
         </div>
     </dialog>
 
-    <script type="module" src="js/app.js"></script>
+    <script type="module" src="js/app-buget.js"></script>
 </body>
 </html>

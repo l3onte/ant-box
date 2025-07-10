@@ -2,9 +2,7 @@ import * as ui from './ui.js';
 
 ui.showMovements();
 ui.openMovementModal();
-ui.openBudgetModal();
 ui.closeModal();
-ui.extractBudgetData();
 
 ui.showOptions();
 ui.openOptions();

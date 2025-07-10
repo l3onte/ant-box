@@ -1,7 +1,9 @@
 import * as api from './api.js';
+
 let balance = 0;
 
 let modal = document.getElementById('modal-principal');
+const allDropdowns = document.querySelectorAll('.dropdown');
 const modalTitle = document.querySelector('.modal__title');
 const modalInputs = document.querySelector('.modal__inputs');
 const modalFooter = document.querySelector('.modal__footer');
@@ -10,7 +12,6 @@ const expenseFilter = document.getElementById('expense-filter');
 const increceFilter = document.getElementById('increase-filter');
 const categoryFilter = document.getElementById('category-filter__input');
 const searchInput = document.getElementById('table__search');
-
 const saveBuget = document.getElementById('save-budget');
 
 function modifyMovementModal() {
@@ -77,6 +78,7 @@ function modifyBudgetModal() {
             <option value="refunds">Refunds</option>
             <option value="other">Other</option>
         </select>
+
         <label for="amount" class="modal__label">Amount</label>
         <input type="number" placeholder="Write the amount" id="amount" class="modal__input">
     
@@ -90,12 +92,17 @@ function modifyBudgetModal() {
     `
 }
 
+
 export function openBudgetModal() {
     document.getElementById('new-budget__button').addEventListener('click', () => {
+        isEditingBudget = false;
+        currentBudgetId = null;
+
         modifyBudgetModal();
         modal.showModal();
     });
 };
+
 
 export function openMovementModal() {
     document.getElementById('new-movement__button').addEventListener('click', () => {
@@ -157,6 +164,40 @@ function sortBy(sortBy, asc, data) {
     }
 }
 
+export function sortByidBudget() {
+    document.querySelector('.sort-by-id').addEventListener('click', () => {
+        showBudgets("SortByID", sortByAsc);
+        sortByAsc = !sortByAsc;
+    });
+}
+
+export function sortByAlphBudget() {
+    document.querySelector('.sort-by-alph').addEventListener('click', () => {
+        showBudgets("SortByAlph", sortByAsc);
+        sortByAsc = !sortByAsc;
+    });
+}
+
+function sorByBudget(sortBy, asc, data) {
+    switch (sortBy) {
+        case "SortByID":
+            data.sort((previus, current) =>  {
+                return asc
+                    ? Number(previus.id) - Number(current.id)
+                    : Number(current.id) - Number(previus.id);
+            });
+        break;
+
+        case "SortByAlph": 
+            data.sort((previus, current) => {
+                return asc
+                    ? previus.category.localeCompare(current.category)
+                    : current.category.localeCompare(previus.category);
+            });
+        break;
+    }
+}
+
 function filterBy(filter, filterData, data) {
     switch(filter) {
         case "date":
@@ -188,6 +229,18 @@ function filterBySearch(term, data) {
         );
 
     }); 
+}
+
+function filterBySearchBudget(term, data) {
+    const lowerTerm = term.toLowerCase();
+
+    return data.filter(budget => {
+        return (
+            budget.category.includes(lowerTerm) ||
+            budget.amount.toString().includes(lowerTerm) ||
+            budget.month.toString().includes(lowerTerm) 
+        )
+    });
 }
 
 export async function showMovements(sort = "", asc = true, filter = "", filterDate = "", search = "") {
@@ -322,6 +375,12 @@ function fillEditModal(movement) {
     document.querySelector('input[placeholder="Write the amount"]').value = movement.amount;
 }
 
+function fillEditModalBudget(budget) {
+    document.getElementById('category').value = budget.category;
+    document.getElementById('amount').value = budget.amount;
+    document.getElementById('month').value = budget.month;
+}
+
 function extractEditMovement(id) {
     modal.addEventListener('click', async function handleEdit(event) {
         if (event.target && event.target.id === 'save-movement') {
@@ -345,7 +404,6 @@ function extractEditMovement(id) {
 
 export function openOptions() {
     document.addEventListener('click', async (event) => {
-        const allDropdowns = document.querySelectorAll('.dropdown');
 
         if (!event.target.closest('.options-container-table')) {
             allDropdowns.forEach(menu => menu.classList.add('hidden'));
@@ -435,21 +493,135 @@ export function search() {
     })
 }
 
+export function searchBudget() {
+    searchInput.addEventListener('input', (event) => {
+        const term = event.target.value;
+        showBudgets("", "", "", "", term);
+    })
+}
+
+let isEditingBudget = false;
+let currentBudgetId = null;
+
 export function extractBudgetData() {
+
     modal.addEventListener('click', async (event) => {
         if (event.target && event.target.id === "save-budget") {
+            event.stopPropagation();
+
             const category = document.getElementById('category').value;
             const amount = document.getElementById('amount').value;
             const month = document.getElementById('month').value;
 
-            let newBuget = {
+            let budget = {
                 category,
                 amount,
                 month
             };
 
-            await api.newBuget(newBuget);
+            if (isEditingBudget && currentBudgetId !== null) {
+                await api.updateBudget(currentBudgetId, budget)
+            } else {
+                await api.newBuget(budget);
+            }
+            
             modal.close();
+            showBudgets();
+
+            isEditingBudget = false;
+            currentBudgetId = null;
         };
     });
+}
+
+function changeMonth(data) {
+    const months = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+    return months[data.month - 1] || "Invalid month";
+}
+
+export async function showBudgets(sort = "", asc = true, filter = "", filterDate = "", search = "") {
+    const tbody = document.querySelector('.tbody-budget');
+    tbody.innerHTML = ``;
+    let data = await api.getBugets();
+
+    if (sort !== "") {
+        sorByBudget(sort, asc, data);
+    }
+
+    if (filter !== "") {
+       data = filterBy(filter, filterDate, data);
+    }
+
+    if (search !== "") {
+        data = filterBySearchBudget(search, data);
+    }
+    
+    data.forEach(budget => {
+        const tr = document.createElement('tr');
+        const monthName = changeMonth(budget);
+        
+        tr.innerHTML = `
+            <td>${budget.id}</td>
+            <td>${monthName}</td>
+            <td>${budget.category}</td>
+            <td>${budget.amount}C$</td>
+            <td class="actions-cell">
+                <div class="options-container-table">
+                    <button class="actions-button">☰</button>
+                    <div class="dropdown hidden">
+                        <button class="dropdown__option edit-btn" data-id="${budget.id}">✏️ Edit</button>
+                        <button class="dropdown__option delete-btn" data-id="${budget.id}">🗑️ Delete</button>
+                    </div>
+                </div>
+            </td>
+        `;
+
+        tbody.appendChild(tr);
+    });
+}
+
+export function openBugetOptions() {
+    document.addEventListener('click', async (event) => {
+        if (!event.target.closest('.options-container-table')) {
+            allDropdowns.forEach(menu => menu.classList.add('hidden'));
+            return;
+        };
+
+        if (event.target.classList.contains('actions-button')) {
+            const menu = event.target.nextElementSibling;
+
+            allDropdowns.forEach(m => {
+                if (m !== menu) m.classList.add('hidden');
+            });
+
+            menu.classList.toggle('hidden');
+        };
+
+        if (event.target.classList.contains('delete-btn')) {
+            const id = event.target.dataset.id;
+
+            if (confirm('Are you sure you want to delete this budget?')) {
+                await api.deleteBudget(id);
+                showBudgets();
+            }
+        };
+
+        if (event.target.classList.contains('edit-btn')) {
+            const id = event.target.dataset.id;
+            const data = await api.getBugets();
+            const budget = data.find(b => b.id === id);
+
+            if (!budget) return alert('Budget not found');
+
+            modifyBudgetModal();
+            fillEditModalBudget(budget);
+            modal.showModal();
+
+            isEditingBudget = true;
+            currentBudgetId = budget.id;
+        }
+    }); 
 }
