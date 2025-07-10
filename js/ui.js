@@ -12,7 +12,6 @@ const expenseFilter = document.getElementById('expense-filter');
 const increceFilter = document.getElementById('increase-filter');
 const categoryFilter = document.getElementById('category-filter__input');
 const searchInput = document.getElementById('table__search');
-
 const saveBuget = document.getElementById('save-budget');
 
 function modifyMovementModal() {
@@ -165,6 +164,40 @@ function sortBy(sortBy, asc, data) {
     }
 }
 
+export function sortByidBudget() {
+    document.querySelector('.sort-by-id').addEventListener('click', () => {
+        showBudgets("SortByID", sortByAsc);
+        sortByAsc = !sortByAsc;
+    });
+}
+
+export function sortByAlphBudget() {
+    document.querySelector('.sort-by-alph').addEventListener('click', () => {
+        showBudgets("SortByAlph", sortByAsc);
+        sortByAsc = !sortByAsc;
+    });
+}
+
+function sorByBudget(sortBy, asc, data) {
+    switch (sortBy) {
+        case "SortByID":
+            data.sort((previus, current) =>  {
+                return asc
+                    ? Number(previus.id) - Number(current.id)
+                    : Number(current.id) - Number(previus.id);
+            });
+        break;
+
+        case "SortByAlph": 
+            data.sort((previus, current) => {
+                return asc
+                    ? previus.category.localeCompare(current.category)
+                    : current.category.localeCompare(previus.category);
+            });
+        break;
+    }
+}
+
 function filterBy(filter, filterData, data) {
     switch(filter) {
         case "date":
@@ -196,6 +229,18 @@ function filterBySearch(term, data) {
         );
 
     }); 
+}
+
+function filterBySearchBudget(term, data) {
+    const lowerTerm = term.toLowerCase();
+
+    return data.filter(budget => {
+        return (
+            budget.category.includes(lowerTerm) ||
+            budget.amount.toString().includes(lowerTerm) ||
+            budget.month.toString().includes(lowerTerm) 
+        )
+    });
 }
 
 export async function showMovements(sort = "", asc = true, filter = "", filterDate = "", search = "") {
@@ -448,6 +493,13 @@ export function search() {
     })
 }
 
+export function searchBudget() {
+    searchInput.addEventListener('input', (event) => {
+        const term = event.target.value;
+        showBudgets("", "", "", "", term);
+    })
+}
+
 let isEditingBudget = false;
 let currentBudgetId = null;
 
@@ -482,17 +534,38 @@ export function extractBudgetData() {
     });
 }
 
-export async function showBudgets() {
+function changeMonth(data) {
+    const months = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+    return months[data.month - 1] || "Invalid month";
+}
+
+export async function showBudgets(sort = "", asc = true, filter = "", filterDate = "", search = "") {
     const tbody = document.querySelector('.tbody-budget');
     tbody.innerHTML = ``;
     let data = await api.getBugets();
 
+    if (sort !== "") {
+        sorByBudget(sort, asc, data);
+    }
+
+    if (filter !== "") {
+       data = filterBy(filter, filterDate, data);
+    }
+
+    if (search !== "") {
+        data = filterBySearchBudget(search, data);
+    }
+    
     data.forEach(budget => {
         const tr = document.createElement('tr');
-
+        const monthName = changeMonth(budget);
+        
         tr.innerHTML = `
             <td>${budget.id}</td>
-            <td>${budget.month}</td>
+            <td>${monthName}</td>
             <td>${budget.category}</td>
             <td>${budget.amount}C$</td>
             <td class="actions-cell">
