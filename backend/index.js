@@ -3,6 +3,8 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 
+import usersRoutes from './routes/usersRoutes.js' 
+
 dotenv.config();
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -26,6 +28,11 @@ app.use(cors({
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+// Rutas
+
+app.use('/ant-box/users', usersRoutes);
+
 
 app.listen(PORT, () => {
     console.log(`Server is running on: ${PORT}`);

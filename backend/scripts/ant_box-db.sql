@@ -71,7 +71,7 @@ CREATE TABLE Detalle_Ventas (
 -- Tabla de Usuarios (para gestionar acceso)
 CREATE TABLE Usuarios (
  id_usuario INT AUTO_INCREMENT,
- username VARCHAR(50) NOT NULL,
+ username VARCHAR(50) NOT NULL UNIQUE,
  password VARCHAR(255) NOT NULL,
  rol ENUM('administrador', 'vendedor') NOT NULL,
  CONSTRAINT usuariopk PRIMARY KEY (id_usuario)
