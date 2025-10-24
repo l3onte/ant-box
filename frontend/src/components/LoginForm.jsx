@@ -1,5 +1,5 @@
-import Input from "./Input"
-import Button from "./Button"
+import Input from "./forms-components/Input"
+import Button from "./forms-components/Button"
 
 export default function LoginForm() {
     return (

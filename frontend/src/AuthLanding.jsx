@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import LoginForm from './components/forms-components/LoginForm';
+import LoginForm from './components/LoginForm';
 import Button from './components/forms-components/Button'
 import AntBoxBlack from './assets/page-img/AntBox-Black.png';
 
@@ -21,7 +21,7 @@ function AuthLanding() {
               <div className='border w-full'></div>
             </div> 
 
-            <Button name={'Crear Cuenta'} type={'signup'}/>
+            <Button name={'Asociar Tienda'} type={'signup'} to={'/signup'}/>
           </div>         
         </div>
       </div>

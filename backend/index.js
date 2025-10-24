@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 3000;
 const app = express();
 
 const corsAllowedOrigins = [
-    'http://localhost:5137'
+    'http://localhost:5173'
 ];
 
 app.use(cors({

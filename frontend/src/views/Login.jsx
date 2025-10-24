@@ -1,4 +1,4 @@
-import LoginForm from "../components/forms-components/LoginForm"
+import LoginForm from "../components/LoginForm"
 import AntBoxBlack from '../assets/page-img/AntBox-Black.png';
 
 export default function Login() {

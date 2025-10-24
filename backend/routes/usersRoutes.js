@@ -4,6 +4,6 @@ import { validateUser } from '../middleware/validateUser.js';
 
 const router = express.Router();
 
-router.post('/postUser', validateUser, UsersController.postUser);
+router.post('/newAssociation', validateUser, UsersController.newAssociation);
 
 export default router;

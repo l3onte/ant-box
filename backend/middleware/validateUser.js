@@ -1,19 +1,20 @@
 import { body, validationResult } from 'express-validator';
 
 export const validateUser = [
-    body('username')
+    body('userData.username')
         .trim()
         .notEmpty().withMessage('El nombre de usuario es requerido.')
-        .isLength({ max: 100 }).withMessage('El nombre de usuario solo puede contener 100 caracteres.'),
+        .isLength({ max: 100 }).withMessage('El nombre de usuario solo puede contener 100 caracteres'),
 
-    body('password')
+    body('userData.password')
         .trim()
         .notEmpty().withMessage('La contraseña es requerida.')
         .isLength({ min: 6 }).withMessage('La contraseña debe ser mayor a 6 caracteres'),
 
-    body('rol') 
+    body('userData.rol')
         .trim()
         .isIn(['administrador', 'vendedor']).withMessage('El rol debe ser "administrador" o "vendedor"'),
+
         
     (req, res, next) => {
         const errors = validationResult(req);
