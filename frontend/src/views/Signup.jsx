@@ -116,7 +116,10 @@ export default function Signup() {
                     <img className="w-80 h-80" src={AntBoxBlack} alt="Ant Box Logo" />
                 </div>
 
-                <form onSubmit={handleSubmit} className="flex flex-col gap-y-4">
+                <form 
+                    onSubmit={handleSubmit} 
+                    className="flex flex-col gap-y-4"  
+                >
                     {/* Users Forms */}
                     <div>
                         <p className="border-b border-gray-300 text-2xl font-bold py-1 mb-1">Información del propietario</p>

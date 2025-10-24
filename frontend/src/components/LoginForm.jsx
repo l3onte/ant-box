@@ -61,7 +61,10 @@ export default function LoginForm() {
   }
 
   return (
-        <form onSubmit={handleLogin} className='flex flex-col gap-4'>
+        <form 
+          onSubmit={handleLogin} 
+          className='flex flex-col gap-4'
+        >
           <Input 
             type={'text'} 
             placeholder={'Nombre de usuario'}

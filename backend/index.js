@@ -4,6 +4,7 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 
 import usersRoutes from './routes/usersRoutes.js' 
+import storeRoutes from './routes/storeRoutes.js'
 
 dotenv.config();
 const PORT = process.env.PORT || 3000;
@@ -32,7 +33,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Rutas
 
 app.use('/ant-box/users', usersRoutes);
-
+app.use('/ant-box/store', storeRoutes);
 
 app.listen(PORT, () => {
     console.log(`Server is running on: ${PORT}`);

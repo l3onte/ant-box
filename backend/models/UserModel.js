@@ -37,17 +37,25 @@ const UserModel = {
         }
     },
 
-    findUsername: async (username) => {
+    findByUsername: async (username) => {
         try {
             const [rows] = await db.query(`
-                SELECT * FROM Usuarios WHERE username = ?;
+                SELECT  
+                    id_usuario AS id,
+                    nombre,
+                    apellido,
+                    correo,
+                    username,
+                    password,
+                    rol
+                FROM Usuarios WHERE username = ?;
             `, [username]);
 
             return rows[0];
         } catch (error) {
             console.error("Error en find username: ", error);
         }
-    }
+    },
 }
 
 export default UserModel;

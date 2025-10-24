@@ -19,7 +19,7 @@ const login = async (req, res) => {
     try {
         const { username, password } = req.body;
 
-        const user = await UserModel.findUsername(username);
+        const user = await UserModel.findByUsername(username);
         if (!user) return res.status(400).json({ message: 'Usuario no encontrado' });
 
         const match = await bcrypt.compare(password, user.password);
