@@ -7,7 +7,7 @@ export default function Signup() {
         <div className="flex justify-center items-center h-screen bg-gray-50/20">
             <div className="flex items-center gap-50">
                 <div>
-                    <img className="w-100 h-100" src={AntBoxBlack} alt="Ant Box Logo" />
+                    <img className="w-80 h-80" src={AntBoxBlack} alt="Ant Box Logo" />
                 </div>
 
                 <form action="" className="flex flex-col gap-y-4">
