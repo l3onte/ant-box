@@ -21,7 +21,12 @@ function AuthLanding() {
               <div className='border w-full'></div>
             </div> 
 
-            <Button name={'Asociar Tienda'} type={'signup'} to={'/signup'}/>
+            <Button 
+              name={'Asociar Tienda'} 
+              type={'signup'} 
+              to={'/signup'}
+              variant={'signup'}
+            />
           </div>         
         </div>
       </div>
