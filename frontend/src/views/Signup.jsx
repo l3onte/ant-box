@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { BadgeInfo } from 'lucide-react';
 import Input from "../components/forms-components/Input";
 import AntBoxBlack from '../assets/page-img/AntBox-Black.png';
 import Button from '../components/forms-components/Button';
@@ -87,13 +88,24 @@ export default function Signup() {
             navigate('/login');
 
         } catch (error) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: error.response?.data?.error || error.message || 'Error al registrar usuario'
-            })
+            const errors = error.response?.data?.errors;
 
-            console.error(error);
+            if (errors && Array.isArray(errors)) {
+                const errorList = errors.map(err => `<li class="text-red-300">${err.msg}</li>`).join('');
+
+                Swal.fire({
+                icon: 'error',
+                title: 'Errores en el formulario',
+                html: `<ul class="text-center">${errorList}</ul>`
+                });
+
+            } else {
+                Swal.fire({
+                icon: 'error',
+                title: '¡Error al asociarse!',
+                text: error.response?.data?.message || 'Error del servidor'
+                })
+            }
         }
     }
 
@@ -107,10 +119,15 @@ export default function Signup() {
                 <form onSubmit={handleSubmit} className="flex flex-col gap-y-4">
                     {/* Users Forms */}
                     <div>
-                        <p className="border-b border-gray-300 text-2xl font-bold py-1 mb-2">Información del propietario</p>
+                        <p className="border-b border-gray-300 text-2xl font-bold py-1 mb-1">Información del propietario</p>
+                        <span className="text-sm text-gray-400 flex items-center gap-2 mb-2">
+                            <BadgeInfo className="w-3 h-3"/>
+                            Los campos con un <span className="text-red-400">*</span>son obligatorios.
+                        </span>
+
                         <div className="flex gap-8">
                             <label className="mb-5">
-                                Nombre
+                                <span className="text-red-400">* </span>Nombre
                                 <Input 
                                     type={'text'}
                                     placeholder={'Leonte'}
@@ -120,7 +137,7 @@ export default function Signup() {
                             </label>
 
                             <label>
-                                Apellido
+                                <span className="text-red-400">* </span>Apellido
                                 <Input 
                                     type={'text'}
                                     placeholder={'Canales'}
@@ -132,7 +149,7 @@ export default function Signup() {
 
                         <div className="flex gap-8">
                             <label>
-                                Nombre de usuario
+                                <span className="text-red-400">* </span>Nombre de usuario
                                 <Input 
                                     type={'text'}
                                     placeholder={'l3onte'}
@@ -142,7 +159,7 @@ export default function Signup() {
                             </label>
                             
                             <label className="mb-5">
-                                Correo
+                                <span className="text-red-400">* </span>Correo
                                 <Input 
                                     type={'text'}
                                     placeholder={'l3onte@antbox.com'}
@@ -154,7 +171,7 @@ export default function Signup() {
 
                         <div className="flex gap-8">
                             <label>
-                                Contraseña
+                                <span className="text-red-400">* </span>Contraseña
                                 <Input 
                                     type={'password'}
                                     placeholder={'Password'}
@@ -164,7 +181,7 @@ export default function Signup() {
                             </label>
 
                             <label>
-                                Confirmar Contraseña
+                                <span className="text-red-400">* </span>Confirmar Contraseña
                                 <Input 
                                     type={'password'}
                                     placeholder={'Confirmar Password'}
@@ -177,10 +194,14 @@ export default function Signup() {
 
                     {/* Shop form */}
                     <div>
-                        <p className="border-b border-gray-300 text-2xl font-bold py-1 mb-2">Información de la tienda</p>
+                        <p className="border-b border-gray-300 text-2xl font-bold py-1 mb-1">Información de la tienda</p>
+                        <span className="text-sm text-gray-400 flex items-center gap-2 mb-2">
+                            <BadgeInfo className="w-3 h-3"/>
+                            Los campos con un <span className="text-red-400">*</span>son obligatorios.
+                        </span>
                         <div className="flex gap-8">
                             <label className="mb-4">
-                                Nombre de la tienda
+                                <span className="text-red-400">* </span>Nombre de la tienda
                                 <Input 
                                     type={'text'}
                                     placeholder={'Pulperia el gato'}
@@ -212,7 +233,10 @@ export default function Signup() {
                             </label>
 
                             <label className="flex flex-col">
-                                Moneda 
+                                <div className="flex">
+                                    <span className="text-red-400 mr-1">*</span>
+                                    <span>Moneda</span> 
+                                </div>
                                 <select 
                                     className="bg-gray-100/70 w-70 shadow-sm placeholder-gray-500 px-4 py-2 rounded transition"
                                     name="moneda"
@@ -238,6 +262,7 @@ export default function Signup() {
                     <Button 
                         name={'Asociar Tienda'}
                         type={'submit'}
+                        variant={'signup'}
                     />
                 </form>
             </div>
