@@ -1,6 +1,6 @@
 import { body, validationResult } from 'express-validator';
 
-export const validateUser = [
+const validateUser = [
     body('userData.username')
         .trim()
         .notEmpty().withMessage('El nombre de usuario es requerido.')
@@ -26,3 +26,25 @@ export const validateUser = [
         next();
     }
 ];
+
+const validateLogin = [
+    body('username')
+        .trim()
+        .notEmpty().withMessage('El nombre de usuario es obligatirio.'),
+    
+    body('password')
+        .trim()
+        .notEmpty().withMessage('La contraseña es obligatoria.'),
+
+    (req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+
+        next();
+    }
+]
+
+export {
+    validateUser,
+    validateLogin
+}
