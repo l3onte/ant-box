@@ -15,13 +15,17 @@ const validateUser = [
         .trim()
         .isIn(['administrador', 'vendedor']).withMessage('El rol debe ser "administrador" o "vendedor"'),
 
+    body('storeData.nombre')
+        .trim()
+        .notEmpty().withMessage('El nombre de la tienda es requerido'),
+
+    body('storeData') 
+        .trim()
+        .notEmpty().withMessage('El tipo de moneda es requerido.'),
         
     (req, res, next) => {
         const errors = validationResult(req);
-
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
-        }
+        if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
         next();
     }
