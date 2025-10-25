@@ -28,7 +28,7 @@ export default function SideBar() {
     }, {});
 
     return (
-        <div className="bg-white min-h-screen w-40 shadow-sm flex py-5 flex-col justify-between">
+        <div className="bg-white min-h-screen w-40 shadow-sm flex py-3 flex-col justify-between">
             <div className="flex flex-col justify-center gap-2">
                 <div className="flex items-center justify-center gap-1">
                     <Box className="text-gray-500"/>
@@ -43,7 +43,7 @@ export default function SideBar() {
 
                 <div>
                     {Object.keys(groupedItems).map((category, idx) => (
-                        <div key={idx} className="flex flex-col mg-4 px-2">
+                        <div key={idx} className="flex flex-col mg-4">
                             <span className="px-3 text-[10px] text-gray-400 py-2">{category}</span>
                             {groupedItems[category].map((item, index) => (
                                 <SideBarItems
