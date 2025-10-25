@@ -1,0 +1,79 @@
+[
+    {
+        "name": "Dashboard",
+        "icon": "ChartPie",
+        "path": "/dashboard",
+        "rolesAllowed": ["administrador"],
+        "category": "Menu Principal"
+    },
+    {
+        "name": "Vendedores",
+        "icon": "Gem",
+        "path": "/vendedores",
+        "rolesAllowed": ["administrador"],
+        "category": "Menu Principal"
+    },
+    {
+        "name": "Clientes",
+        "icon": "Contact",
+        "path": "/clientes",
+        "rolesAllowed": ["administrador", "vendedores"],
+        "category": "Menu Principal"
+    },
+    {
+        "name": "Proveedores",
+        "icon": "Briefcase",
+        "path": "/proveedores",
+        "rolesAllowed": ["administrador", "vendedores"],
+        "category": "Menu Principal"
+    },
+    {
+        "name": "Productos",
+        "icon": "PackageSearch",
+        "path": "/productos",
+        "rolesAllowed": ["administrador", "vendedores"],
+        "category": "Menu Principal"
+    },
+    {
+        "name": "Ventas",
+        "icon": "CreditCard",
+        "path": "/ventas",
+        "rolesAllowed": ["administrador", "vendedores"],
+        "category": "Reportes"
+    },
+    {
+        "name": "Compras",
+        "icon": "ShoppingCart",
+        "path": "/inventario",
+        "rolesAllowed": ["administrador", "vendedores"],
+        "category": "Reportes"
+    },
+    {
+        "name": "Ganancias",
+        "icon": "BanknoteArrowUp",
+        "path": "/ganancias",
+        "rolesAllowed": ["administrador"],
+        "category": "Reportes"
+    },
+    {
+        "name": "Inventario",
+        "icon": "Archive",
+        "path": "/inventario",
+        "rolesAllowed": ["administrador", "vendedores"],
+        "category": "Reportes"
+    },
+    {
+        "name": "Ayuda",
+        "icon": "Info",
+        "path": "/ayuda",
+        "rolesAllowed": ["administrador", "vendedores"],
+        "category": "Configuracion"
+    },
+    {
+        "name": "Configuracion",
+        "icon": "Settings",
+        "path": "/configuracion",
+        "rolesAllowed": ["administrador", "vendedores"],
+        "category": "Configuracion"
+    }
+]
