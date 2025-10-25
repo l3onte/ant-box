@@ -44,7 +44,7 @@
     {
         "name": "Compras",
         "icon": "ShoppingCart",
-        "path": "/inventario",
+        "path": "/compras",
         "rolesAllowed": ["administrador", "vendedores"],
         "category": "Reportes"
     },
