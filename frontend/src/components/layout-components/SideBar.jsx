@@ -41,9 +41,9 @@ export default function SideBar() {
                     </div>
                 </div>
 
-                <div className="px-2">
+                <div>
                     {Object.keys(groupedItems).map((category, idx) => (
-                        <div key={idx} className="flex flex-col mg-4">
+                        <div key={idx} className="flex flex-col mg-4 px-2">
                             <span className="px-3 text-[10px] text-gray-400 py-2">{category}</span>
                             {groupedItems[category].map((item, index) => (
                                 <SideBarItems
