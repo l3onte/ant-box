@@ -3,6 +3,6 @@ import StoreController from '../controllers/StoreController.js';
 
 const route = express.Router();
  
-route.get('/getStoreName/:id', StoreController.getStoreName);
+route.get('/getStoreById/:id', StoreController.getStoreById);
 
 export default route;

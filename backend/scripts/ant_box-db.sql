@@ -8,7 +8,7 @@ CREATE TABLE Usuarios (
  id_usuario INT AUTO_INCREMENT,
  nombre VARCHAR(100) NOT NULL,
  apellido VARCHAR(100) NOT NULL,
- correo VARCHAR(100) NOT NULL,
+ correo VARCHAR(100) NOT NULL UNIQUE,
  username VARCHAR(50) NOT NULL UNIQUE,
  password VARCHAR(255) NOT NULL,
  rol ENUM('administrador', 'vendedor') NOT NULL,
@@ -30,6 +30,23 @@ CREATE TABLE Tiendas (
   REFERENCES Usuarios(id_usuario)
   ON DELETE CASCADE
   ON UPDATE CASCADE
+);
+
+CREATE TABLE Vendedores (
+	id_vendedor INT AUTO_INCREMENT,
+    id_tienda INT NOT NULL,
+    id_usuario INT NOT NULL,
+    
+    CONSTRAINT pk_vendedores PRIMARY KEY (id_vendedor),
+    CONSTRAINT fk_vendedores_usuarios FOREIGN KEY (id_usuario) 
+		REFERENCES Usuarios(id_usuario)
+		ON DELETE CASCADE
+        ON UPDATE CASCADE,
+        
+	CONSTRAINT fk_vendedores_tienda FOREIGN KEY (id_tienda)
+		REFERENCES Tiendas(id_tienda)
+		ON DELETE CASCADE
+        ON UPDATE CASCADE
 );
 
 -- Tabla de Proveedores

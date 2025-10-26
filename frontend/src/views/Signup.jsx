@@ -9,7 +9,6 @@ import Swal from 'sweetalert2';
 
 export default function Signup() {
     const navigate = useNavigate();
-    const [error, setError] = useState('');
      
     const [userData, setUserData] = useState({
         nombreUsuario: '',
@@ -26,8 +25,7 @@ export default function Signup() {
         nombreTienda: '',
         direccion: '',
         telefono: '',
-        moneda: '',
-        logo: ''
+        moneda: 'NIO',
     });
 
     const handleUserChange = (event) => {
@@ -42,7 +40,6 @@ export default function Signup() {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        setError('');
         
         if (userData.password !== passwordConfirm) {
             Swal.fire({
@@ -59,7 +56,7 @@ export default function Signup() {
                 storeData
             }
 
-            const response = await API.post('/ant-box/users/newAssociation', payload);
+            await API.post('/ant-box/users/newAssociation', payload);
 
             Swal.fire({
                 icon: 'success',
@@ -243,10 +240,11 @@ export default function Signup() {
                                 <select 
                                     className="bg-gray-100/70 w-70 shadow-sm placeholder-gray-500 px-4 py-2 rounded transition"
                                     name="moneda"
+                                    value={storeData.moneda}
                                     onChange={handleStoreChange}
                                 >
-                                    <option>NIO - Córdoba</option>
-                                    <option>USD - Dólar Estadounidense</option>
+                                    <option value="NIO">NIO - Córdoba</option>
+                                    <option value="USD">USD - Dólar Estadounidense</option>
                                 </select>
                             </label>
                         </div>
@@ -256,8 +254,7 @@ export default function Signup() {
                         <label>
                             Logo de la tienda 
                             <Input 
-                                type="file" 
-                                onChange={(e) => setStoreData({ ...storeData, logo: e.target.files[0] })}      
+                                type="file"     
                             />
                         </label>
                     </div>

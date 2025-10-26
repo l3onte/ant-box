@@ -1,24 +1,11 @@
-import { useEffect, useState } from "react"
-import { useUser } from '../../services/userContext'
-import API from '../../services/API.js'
+import { useStore } from "../../services/storeContext.jsx";
 import { Box  } from 'lucide-react';
 import SideBarItems from "./SideBarItems.jsx";
 import itemsJSON from "../../data/sideBarItems.json";
 import SwitchButton from "./SwitchButton.jsx";
 
 export default function SideBar() {
-    const { user } = useUser();
-    const [storeName, setStoreName] = useState('');
-
-    useEffect(() => {
-        if (!user || !user.id) return;
-
-        API.get(`/ant-box/store/getStoreName/${user.id}`)
-            .then((reponse) => {
-                setStoreName(reponse.data?.nombre || 'Unknown');
-            })
-            .catch(err => console.error('Error fetching data: ', err));
-    }, [user]);
+    const { store } = useStore();
 
     const groupedItems = itemsJSON.reduce((acc, item) => {
         if (!acc[item.category])  acc[item.category] = [];
@@ -34,7 +21,7 @@ export default function SideBar() {
                     <Box className="text-gray-500"/>
                     <div className="flex flex-col">
                         <span className="text-md font-bold text-red-300">
-                            {storeName}
+                            {store?.nombre || 'Sin tienda'}
                         </span>
 
                         <span className="text-[9px] text-gray-400">Administrador</span>

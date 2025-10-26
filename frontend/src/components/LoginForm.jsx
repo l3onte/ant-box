@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useUser } from '../services/userContext';
+import { useStore } from "../services/storeContext";
 import { useNavigate } from "react-router-dom";
 import Input from "./forms-components/Input"
 import Button from "./forms-components/Button"
@@ -13,6 +14,8 @@ export default function LoginForm() {
     username: '',
     password: ''
   });  
+
+  const { setStore } = useStore();
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -28,9 +31,16 @@ export default function LoginForm() {
         password: loginData.password
       });
 
-      setUser(response.data.user);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      const user = response.data.user;
+      setUser(user);
+      localStorage.setItem('user', JSON.stringify(user));
     
+      const storeResponse = await API.get(`/ant-box/store/getStoreById/${user.id}`);
+      const storeData = storeResponse.data;
+
+      setStore(storeData);
+      localStorage.setItem('store', JSON.stringify(storeData)); 
+
       Swal.fire({
         icon: 'success',
         title: '¡Inicio de sesión exitoso!',

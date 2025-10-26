@@ -15,11 +15,10 @@ const UserModel = {
 
             const userId = resultUser.insertId;
             const { nombreTienda, direccion, telefono, moneda, logo } = storeData;
-            const monedaValue = moneda || 'NIO'
 
-            const [resultStore] = await connection.query(`
+            await connection.query(`
                 INSERT INTO Tiendas (id_usuario, nombre, direccion, telefono, moneda, logo) VALUES (?, ?, ?, ?, ?, ?);   
-            `, [userId, nombreTienda, direccion, telefono, monedaValue, null]);
+            `, [userId, nombreTienda, direccion, telefono, moneda, null]);
 
             await connection.commit(); // Si no hay error se commitea en al base de datos
 

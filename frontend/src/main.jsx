@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { UserProvider } from './services/userContext.jsx'
+import { StoreProvider } from './services/storeContext.jsx'
 import './index.css'
 import AuthLanding from './AuthLanding.jsx'
 import Signup from './views/Signup.jsx'
@@ -39,8 +40,10 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <UserProvider>
-      <RouterProvider router={router} />
-    </UserProvider>
+    <StoreProvider>
+      <UserProvider>
+        <RouterProvider router={router} />
+      </UserProvider>
+    </StoreProvider>
   </StrictMode>,
 )
