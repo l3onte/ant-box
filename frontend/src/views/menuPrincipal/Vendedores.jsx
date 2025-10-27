@@ -3,12 +3,13 @@ import { useStore } from "../../services/storeContext"
 import API from '../../services/API.js'
 import ModuleLayout from "../../components/layout-components/ModuleLayout"
 import Table from "../../components/layout-components/Table.jsx"
-import { Trash2, Edit, icons } from 'lucide-react'
+import { Trash2, Edit } from 'lucide-react'
 import Pagination from "../../components/layout-components/table-components/Pagination.jsx"
 import Search from "../../components/layout-components/table-components/Search.jsx"
 import FilterButton from "../../components/layout-components/table-components/FilterButton.jsx"
 import SortButton from "../../components/layout-components/table-components/SortButton.jsx"
 import Swal from 'sweetalert2'
+import FormVendedor from "../../components/forms/FormVendedor.jsx"
 
 export default function Vendedores() {
     const moduleInfo = {
@@ -23,6 +24,7 @@ export default function Vendedores() {
     const [limit] = useState(10);
     const [total, setTotal] = useState(0);
     const [sellersData, setSellersData] = useState([]);
+    const [refresh, setRefresh] = useState(false);
 
     const handleDelete = async (id) => {
         const result = await Swal.fire({
@@ -97,10 +99,18 @@ export default function Vendedores() {
                 setTotal(response.data.total);
             })
             .catch(error => console.error(error));
-    }, [store.id_tienda, page])
+    }, [store.id_tienda, page, refresh])
 
     return (
-        <ModuleLayout moduleInfo={moduleInfo}>
+        <ModuleLayout 
+            moduleInfo={moduleInfo}
+            modalContent={({ closeModal }) => (
+                <FormVendedor 
+                    onClose={closeModal}  
+                    onSuccess={() => setRefresh(prev => !prev)}
+                />
+            )}
+        >
             <div className="flex w-full justify-between">
                 <Search />
                 

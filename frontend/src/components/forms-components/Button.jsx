@@ -1,7 +1,7 @@
 import { Upload } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-export default function Button({ name, type, variant, to }) {
+export default function Button({ name, type, variant, to, onClick }) {
 
     const buttonVariant = {
         login: "bg-sky-400 text-white text-xl font-bold hover:bg-sky-300 transition transform duration-300",
@@ -10,7 +10,11 @@ export default function Button({ name, type, variant, to }) {
     }
     
     if (variant === "add") return (
-        <button type="submit" className={`text-center cursor-pointer p-2 rounded shadow-md flex items-center gap-2 ${buttonVariant[variant]}`}> 
+        <button 
+            type="submit" 
+            className={`text-center cursor-pointer p-2 rounded shadow-md flex items-center gap-2 ${buttonVariant[variant]}`}
+            onClick={onClick}
+        > 
             <Upload className='w-4'/>
             {name}
         </button>
