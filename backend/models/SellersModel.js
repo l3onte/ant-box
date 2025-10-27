@@ -37,7 +37,9 @@ const Sellers = {
         }
     },
 
-    getSellers: async (id) => {
+    getSellers: async (id, page = 1, limit = 5) => {
+        const offset = (page - 1) * limit;
+        
         try {
             const [rows] = await db.query(`
                 SELECT 
@@ -49,10 +51,17 @@ const Sellers = {
                 FROM Vendedores
                 INNER JOIN Usuarios ON Usuarios.id_usuario = Vendedores.id_usuario
                 WHERE Vendedores.id_tienda = ?
-                ORDER BY Vendedor ASC;
+                ORDER BY Vendedor ASC
+                LIMIT ? OFFSET ?;
+            `, [id, limit, offset]);
+
+            const [countResult] = await db.query(`
+                SELECT COUNT(*) AS total FROM Vendedores WHERE id_tienda = ?;
             `, [id]);
 
-            return rows;
+            const total = countResult[0]?.total || 0;
+
+            return { rows, total };
         } catch (error) {
             console.error("Error en getSellers: ", error);
             throw new Error('Error al obtener los vendedores.');

@@ -1,6 +1,5 @@
 import Button from "../forms-components/Button"
-
-export default function ModuleLayout({ moduleInfo }) {
+export default function ModuleLayout({ moduleInfo, children }) {
     return (
         <div className="flex flex-col p-5 gap-5 h-full">
             <div className="flex justify-between">
@@ -16,8 +15,8 @@ export default function ModuleLayout({ moduleInfo }) {
                     />
                 </div>
             </div>
-            <div className="flex justify-center items-center bg-gray-50 grow rounded shadow-sm text-gray-400">
-                Empty
+            <div className="flex flex-col gap-3 justify-between items-center bg-gray-50 grow rounded shadow-sm text-gray-400 p-5">
+                {children}
             </div>
         </div>
     )
