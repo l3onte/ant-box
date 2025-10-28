@@ -1,0 +1,12 @@
+import express from 'express';
+import SuppliersController from '../controllers/SuppliersController.js'
+import { validateSupplier, validateUpdateSupplier } from '../middleware/middlewareSupplier.js';
+
+const Route = express.Router();
+
+Route.post('/postSupplier/:id_tienda', validateSupplier, SuppliersController.postSupplier);
+Route.get('/getSuppliers/:id_tienda', SuppliersController.getSuppliers);
+Route.put('/updateSupplier/:id_supplier', validateUpdateSupplier, SuppliersController.updateSupplier);
+Route.delete('/deleteSupplier/:id_supplier', SuppliersController.deleteSupplier);
+
+export default Route;

@@ -32,6 +32,7 @@ CREATE TABLE Tiendas (
   ON UPDATE CASCADE
 );
 
+
 CREATE TABLE Vendedores (
 	id_vendedor INT AUTO_INCREMENT,
     id_tienda INT NOT NULL,
@@ -52,10 +53,10 @@ CREATE TABLE Vendedores (
 -- Tabla de Proveedores
 CREATE TABLE Proveedores (
  id_proveedor INT AUTO_INCREMENT,
- nombre VARCHAR(100) NOT NULL,
+ nombre VARCHAR(100) NOT NULL UNIQUE,
  direccion VARCHAR(255),
  telefono VARCHAR(20),
- email VARCHAR(100),
+ email VARCHAR(100) UNIQUE,
  id_tienda INT NOT NULL,
 
  CONSTRAINT pk_proveedores PRIMARY KEY (id_proveedor),
