@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { EyeClosed, Eye, Upload } from "lucide-react"
 
-export default function Input({ type, placeholder, onChange, name }) {
+export default function Input({ type, placeholder, onChange, name, value }) {
     const [isEyeOpen, setIsEyeOpen] = useState(false);
     const [fileName, setFileName] = useState("");
 
@@ -26,6 +26,7 @@ export default function Input({ type, placeholder, onChange, name }) {
                     <input 
                         type="file" 
                         className="hidden" 
+                        value={value}
                         onChange={handleFileChange}
                     />
                 </label>
@@ -41,6 +42,7 @@ export default function Input({ type, placeholder, onChange, name }) {
                     className={`${baseStyle}`}
                     type={type}
                     name={name}
+                    value={value}
                     onChange={onChange}
                     placeholder={placeholder} 
                 />

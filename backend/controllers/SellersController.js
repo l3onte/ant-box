@@ -53,11 +53,11 @@ const updateSeller = async (req, res) => {
         if (!id) 
             return res.status(400).json({ message: 'El id del vendedor es requerido.' });
         
-        const { updateData } = req.body;
-        if (!updateData) 
+        const { userData } = req.body;
+        if (!userData) 
             return res.status(400).json({ message: 'Los datos para actualizar el vendedor es requerido.' });
 
-        const result = await SellersModel.updateSeller(id, updateData);
+        const result = await SellersModel.updateSeller(id, userData);
         if (!result) 
             return res.status(404).json({ message: 'No se pudo actualizar el vendedor.' });
 

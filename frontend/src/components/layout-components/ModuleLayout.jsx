@@ -1,6 +1,5 @@
 import { useState } from "react"
 import Button from "../forms-components/Button"
-import Input from "../forms-components/Input"
 import Modal from "../Modal";
 
 export default function ModuleLayout({ moduleInfo, children, modalContent }) {

@@ -52,6 +52,50 @@ const validateSeller = [
     }
 ];
 
+const validateUpdateSeller = [
+    body('userData.username')
+        .trim()
+        .notEmpty().withMessage('El username es requerido')
+        .custom(async (username, { req }) => {
+            const { id } = req.params;
+            const [rows] = await db.query('SELECT * FROM Usuarios WHERE username = ? AND id_usuario != ?;', [username, id]);
+            if (rows.length > 0) {
+                throw new Error('El username ya está registrado.');
+            }
+
+            return true
+        }),
+
+    body('userData.nombre')
+        .trim()
+        .notEmpty().withMessage('El nombre es requerido.'),
+
+    body('userData.apellido')
+        .trim()
+        .notEmpty().withMessage('El apellido es requerido.'),
+
+    body('userData.correo')
+        .trim()
+        .notEmpty().withMessage('El correo es requerido.')
+        .custom(async (correo, { req }) => {
+            const { id } = req.params;
+            const [rows] = await db.query(`SELECT * FROM Usuarios WHERE correo = ? AND id_usuario != ?;`, [correo, id]);
+            if (rows.length > 0) {
+                throw new Error('El correo ya está en uso.');
+            }
+
+            return true;
+        }),
+
+    (req, res, next) => {
+        const errors = validationResult(req);
+        if (!errors.isEmpty())
+            return res.status(400).json({ errors: errors.array() });
+
+        next();
+    }
+]
+
 const validateUser = [
     body('userData.username')
         .trim()
@@ -111,5 +155,6 @@ const validateLogin = [
 export {
     validateUser,
     validateLogin,
-    validateSeller
+    validateSeller,
+    validateUpdateSeller
 }

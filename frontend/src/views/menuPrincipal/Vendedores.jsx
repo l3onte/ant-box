@@ -10,6 +10,7 @@ import FilterButton from "../../components/layout-components/table-components/Fi
 import SortButton from "../../components/layout-components/table-components/SortButton.jsx"
 import Swal from 'sweetalert2'
 import FormVendedor from "../../components/forms/FormVendedor.jsx"
+import Modal from "../../components/Modal.jsx"
 
 export default function Vendedores() {
     const moduleInfo = {
@@ -25,6 +26,8 @@ export default function Vendedores() {
     const [total, setTotal] = useState(0);
     const [sellersData, setSellersData] = useState([]);
     const [refresh, setRefresh] = useState(false);
+    const [isEditModalOpen, setEditModal] = useState(false);
+    const [selectedSeller, setSelectedSeller] = useState(null);
 
     const handleDelete = async (id) => {
         const result = await Swal.fire({
@@ -63,6 +66,11 @@ export default function Vendedores() {
         }
     }
 
+    const handleEdit = (seller) => {
+        setSelectedSeller(seller);
+        setEditModal(true);
+    }
+
     const columns = [
         { header: 'id', accessor: 'id' },
         { header: 'Vendedor', accessor: 'Vendedor' },
@@ -81,6 +89,7 @@ export default function Vendedores() {
                         <Trash2 size={16} />
                     </button>
                     <button
+                        onClick={() => handleEdit(row)}
                         className="p-1 text-gray-700 rounded cursor-pointer hover:text-gray-500"
                     >
                         <Edit size={16} />
@@ -126,6 +135,23 @@ export default function Vendedores() {
                 total={total}
                 onPageChange={(newPage) => setPage(newPage)}
             />
+
+            {isEditModalOpen && (
+                <Modal
+                    onClose={() => setEditModal(false)}
+                    modalTitle={"Editar Vendedor"}
+                >
+                    <FormVendedor 
+                        onClose={() => setEditModal(false)}
+                        onSuccess={() => {
+                            setEditModal(false);
+                            setRefresh(prev => !prev);
+                        }}
+                        sellerData={selectedSeller}
+                        isEditing={true}
+                    />
+                </Modal>
+            )}
         </ModuleLayout>
     )
 }

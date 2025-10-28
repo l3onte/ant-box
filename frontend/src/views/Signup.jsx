@@ -91,16 +91,16 @@ export default function Signup() {
                 const errorList = errors.map(err => `<li class="text-red-300">${err.msg}</li>`).join('');
 
                 Swal.fire({
-                icon: 'error',
-                title: 'Errores en el formulario',
-                html: `<ul class="text-center">${errorList}</ul>`
+                    icon: 'error',
+                    title: 'Errores en el formulario',
+                    html: `<ul class="text-center">${errorList}</ul>`
                 });
 
             } else {
                 Swal.fire({
-                icon: 'error',
-                title: '¡Error al asociarse!',
-                text: error.response?.data?.message || 'Error del servidor'
+                    icon: 'error',
+                    title: '¡Error al asociarse!',
+                    text: error.response?.data?.message || 'Error del servidor'
                 })
             }
         }
