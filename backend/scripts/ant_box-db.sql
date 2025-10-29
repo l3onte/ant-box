@@ -57,6 +57,7 @@ CREATE TABLE Proveedores (
  direccion VARCHAR(255),
  telefono VARCHAR(20),
  email VARCHAR(100) UNIQUE,
+ status ENUM('Activo', 'Inactivo') NOT NULL,
  id_tienda INT NOT NULL,
 
  CONSTRAINT pk_proveedores PRIMARY KEY (id_proveedor),

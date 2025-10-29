@@ -3,12 +3,12 @@ import db from '../config/db.js'
 const Suppliers = {
     postSuppliers: async (id_tienda, supplierData) => {
         try {
-            const { nombre, direccion, telefono, email } = supplierData; 
+            const { nombre, direccion, telefono, email, status } = supplierData; 
 
             const [rows] = await db.query(`
-                INSERT INTO Proveedores (nombre, direccion, telefono, email, id_tienda)
-                VALUES (?, ?, ?, ?, ?);
-            `, [nombre, direccion, telefono, email, id_tienda]);
+                INSERT INTO Proveedores (nombre, direccion, telefono, email, status, id_tienda)
+                VALUES (?, ?, ?, ?, ?, ?);
+            `, [nombre, direccion, telefono, email, status, id_tienda]);
 
             const supplierId = rows.insertId;
             
@@ -29,7 +29,8 @@ const Suppliers = {
                     nombre,
                     direccion,
                     telefono,
-                    email
+                    email,
+                    status
                 FROM Proveedores
                 WHERE id_tienda = ?
                 LIMIT ? OFFSET ?;
@@ -48,24 +49,24 @@ const Suppliers = {
         }
     },
 
-    updateSupplier: async (id_supplier, updateData) => {
+    updateSupplier: async (id_proveedor, updateData) => {
         try {
-            const { nombre, direccion, telefono, email } = updateData;
+            const { nombre, direccion, telefono, email, status } = updateData;
 
             const [existing] = await db.query(`
                 SELECT id_proveedor
                 FROM Proveedores
                 WHERE (nombre = ? OR email = ?) AND id_proveedor != ?;
-            `, [nombre, email, id_supplier]);
+            `, [nombre, email, id_proveedor]);
 
             if (existing.length > 0) 
                 throw new Error('El email o nombre ya están en uso por otro proveedor.');
 
             const [rows] = await db.query(`
                 UPDATE Proveedores
-                SET nombre = ?, direccion = ?, telefono = ?, email = ?
+                SET nombre = ?, direccion = ?, telefono = ?, email = ?, status = ?
                 WHERE id_proveedor = ?;
-            `, [nombre, direccion, telefono, email, id_supplier]);
+            `, [nombre, direccion, telefono, email, status, id_proveedor]);
 
             if (rows.affectedRows === 0) 
                 throw new Error('No se encontró el proveedor a actualizar.');
@@ -77,11 +78,11 @@ const Suppliers = {
         }
     },
 
-    deleteSupplier: async (id_supplier) => {
+    deleteSupplier: async (id_proveedor) => {
         try {
             const [result] = await db.query(`
                 DELETE FROM Proveedores WHERE id_proveedor = ?;
-            `, [id_supplier]);
+            `, [id_proveedor]);
 
             if (result.affectedRows === 0) 
                 throw new Error('No se encontro el proveedor.');

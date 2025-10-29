@@ -38,16 +38,16 @@ const getSuppliers = async (req, res) => {
 
 const updateSupplier = async (req, res) => {
     try {
-        const { id_supplier } = req.params;
+        const { id_proveedor } = req.params;
         const { updateData } = req.body;
 
-        if (!id_supplier)
+        if (!id_proveedor)
             return res.status(400).json({ message: 'El id del proveedor es requerido.' });
 
         if (!updateData)
             return res.status(400).json({ message: 'Los datos de la actualización son requeridos.' });
 
-        const result = await SuppliersModel.updateSupplier(id_supplier, updateData);
+        const result = await SuppliersModel.updateSupplier(id_proveedor, updateData);
         return res.status(200).json(result);
 
     } catch (error) {
@@ -57,11 +57,11 @@ const updateSupplier = async (req, res) => {
 
 const deleteSupplier = async (req, res) => {
     try {
-        const { id_supplier } = req.params;
-        if (!id_supplier) 
+        const { id_proveedor } = req.params;
+        if (!id_proveedor) 
             return res.status(400).json({ message: 'El id del proveedor es requerido.' });
 
-        const result = await SuppliersModel.deleteSupplier(id_supplier);
+        const result = await SuppliersModel.deleteSupplier(id_proveedor);
         return res.status(200).json(result);
 
     } catch (error) {

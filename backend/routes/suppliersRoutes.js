@@ -6,7 +6,7 @@ const Route = express.Router();
 
 Route.post('/postSupplier/:id_tienda', validateSupplier, SuppliersController.postSupplier);
 Route.get('/getSuppliers/:id_tienda', SuppliersController.getSuppliers);
-Route.put('/updateSupplier/:id_supplier', validateUpdateSupplier, SuppliersController.updateSupplier);
-Route.delete('/deleteSupplier/:id_supplier', SuppliersController.deleteSupplier);
+Route.put('/updateSupplier/:id_proveedor', validateUpdateSupplier, SuppliersController.updateSupplier);
+Route.delete('/deleteSupplier/:id_proveedor', SuppliersController.deleteSupplier);
 
 export default Route;
