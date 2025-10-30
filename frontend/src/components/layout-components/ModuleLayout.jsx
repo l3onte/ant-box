@@ -13,12 +13,14 @@ export default function ModuleLayout({ moduleInfo, children, modalContent }) {
                     <span className="text-gray-400 text-[13px]">{moduleInfo.route}</span>
                 </div>
                 <div>
-                    <Button 
+                    {moduleInfo.buttonType && (
+                        <Button 
                         name={moduleInfo.buttonName}
                         type={moduleInfo.buttonType}
                         variant={moduleInfo.buttonVariant}
                         onClick={() => setIsAddModal(!isAddModalOpen)}
-                    />
+                        />
+                    )}
                 </div>
             </div>
             <div className="flex flex-col gap-3 justify-between items-center bg-gray-50 grow rounded shadow-sm text-gray-400 p-5">
