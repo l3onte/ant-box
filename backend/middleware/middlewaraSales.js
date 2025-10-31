@@ -48,4 +48,4 @@ const validateSale = [
     }
 ];
 
-export default {validateSale};
+export {validateSale};

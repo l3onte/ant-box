@@ -49,18 +49,20 @@ const SalesModel = {
             const [rows] = await db.query(`
                 SELECT 
                     v.id_venta,
+                    DATE_FORMAT(v.fecha_venta, '%d/%m/%Y') AS Fecha,
                     c.nombre AS Cliente,
                     p.nombre AS Producto,
-                    p.descripcion,
-                    dv.cantidad,
-                    dv.precio_unitario,
-                    v.total
+                    p.descripcion AS Descripcion,
+                    dv.cantidad AS Cantidad,
+                    dv.precio_unitario AS Precio_Unitario,
+                    v.total AS Total
                 FROM Ventas v
                 INNER JOIN Tiendas t ON t.id_tienda = v.id_tienda
                 INNER JOIN Detalle_Ventas dv ON dv.id_venta = v.id_venta
                 INNER JOIN Clientes c ON c.id_cliente = v.id_cliente
                 INNER JOIN Productos p ON p.id_producto = dv.id_producto
                 WHERE t.id_tienda = ?
+                ORDER BY Fecha DESC
                 LIMIT ? OFFSET ?;
             `, [id_tienda, limit, offset]);
 
