@@ -77,6 +77,7 @@ CREATE TABLE Productos (
  precio_venta DECIMAL(10,2),
  stock INT NOT NULL,
  stock_minimo INT NOT NULL,
+ precio_unitario DECIMAL(10,2) NOT NULL,
  id_proveedor INT,
  id_tienda INT NOT NULL,
 
@@ -130,7 +131,6 @@ CREATE TABLE Detalle_Ventas (
  id_venta INT NOT NULL,
  id_producto INT NOT NULL,
  cantidad INT NOT NULL,
- precio_unitario DECIMAL(10,2) NOT NULL,
 
  CONSTRAINT pk_detalle_ventas PRIMARY KEY (id_detalle),
  CONSTRAINT fk_detalle_venta FOREIGN KEY (id_venta)
@@ -175,68 +175,3 @@ CREATE TABLE Detalle_Compras (
   REFERENCES Productos(id_producto)
   ON DELETE RESTRICT
 );
-
--- --------------------------
--- INSERTS DE PRUEBA INVENTARIO
--- --------------------------
-
--- 3️⃣ Proveedores
-INSERT INTO Proveedores (nombre, direccion, telefono, email, status, id_tienda)
-VALUES
-('Distribuidora Nexo', 'Av. Central 123', '2222-1111', 'contacto@nexo.com', 'Activo', 1),
-('Tech Import', 'Calle 45 #12', '3333-2222', 'ventas@techimport.com', 'Activo', 1);
-
--- 4️⃣ Productos
-INSERT INTO Productos (nombre, descripcion, precio_compra, porcentaje_ganancia, precio_venta, stock, stock_minimo, id_proveedor, id_tienda)
-VALUES
-('Mouse Logitech', 'Mouse óptico USB', 10.00, 50.00, 15.00, 20, 5, 1, 1),
-('Teclado Redragon', 'Teclado mecánico RGB', 20.00, 40.00, 28.00, 15, 3, 2, 1),
-('Monitor LG 24"', 'Monitor LED 24 pulgadas', 100.00, 30.00, 130.00, 10, 2, 2, 1);
-
--- 5️⃣ Compras
-INSERT INTO Compras (id_proveedor, fecha_compra, total, id_tienda)
-VALUES
-(1, '2025-10-01', 250.00, 1),
-(2, '2025-10-05', 300.00, 1);
-
--- 6️⃣ Detalle_Compras
-INSERT INTO Detalle_Compras (id_compra, id_producto, cantidad, precio_compra)
-VALUES
-(1, 1, 10, 10.00),  -- Compra de 10 Mouse Logitech
-(1, 2, 5, 20.00),   -- Compra de 5 Teclados Redragon
-(2, 3, 3, 100.00);  -- Compra de 3 Monitores LG 24"
-
--- 7️⃣ Ventas
-INSERT INTO Ventas (fecha_venta, id_cliente, id_tienda, total)
-VALUES
-('2025-10-10', NULL, 1, 75.00),  -- Venta 1
-('2025-10-12', NULL, 1, 84.00);  -- Venta 2
-
--- 8️⃣ Detalle_Ventas
-INSERT INTO Detalle_Ventas (id_venta, id_producto, cantidad, precio_unitario)
-VALUES
-(1, 1, 5, 15.00),   -- Se vendieron 5 Mouse Logitech
-(2, 2, 3, 28.00);   -- Se vendieron 3 Teclados Redragon
-
-SELECT 
-	p.id_producto,
-	p.nombre,
-    p.descripcion,
-    p.stock AS stock_actual,
-    p.stock_minimo,
-    p.precio_compra,
-    p.precio_venta,
-    p.porcentaje_ganancia,
-    prov.nombre AS proveedor,
-    COALESCE(SUM(dc.cantidad),0) AS total_comprando,
-    COALESCE(SUM(dv.cantidad),0) AS total_vendido,
-    COALESCE(SUM(dc.cantidad) - COALESCE(SUM(dv.cantidad), 0)) AS stock_real,
-    CASE WHEN p.stock < p.stock_minimo 
-		THEN 'Bajo' 
-        ELSE 'OK' 
-        END AS alerta_stock
-FROM Productos p
-LEFT JOIN Proveedores prov ON prov.id_proveedor = p.id_proveedor
-LEFT JOIN Detalle_Compras dc ON dc.id_producto = p.id_producto
-LEFT JOIN Detalle_Ventas dv ON dv.id_producto = p.id_producto
-GROUP BY p.id_producto;

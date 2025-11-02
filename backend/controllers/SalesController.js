@@ -35,6 +35,20 @@ const getSales = async (req, res) => {
     }
 };
 
+const getSaleDetails = async (req, res) => {
+    try {
+        const { id_venta } = req.params;
+        if (!id_venta)
+                return res.status(400).json({ message: 'El id de la venta es requerido.' });
+
+        const result = await SalesModel.getSaleDetails(id_venta);
+        return res.status(200).json(result);
+    } catch (error) {
+        console.error('Error getSaleDetails: ', error.message);
+        res.status(500).json({ message: 'Error al obtener los detalles de la venta.', error: error.message });
+    }
+}
+
 const updateSale = async (req, res) => {
     try {
         const { id_venta } = req.params;
@@ -69,9 +83,25 @@ const deleteSale = async (req, res) => {
     }
 }
 
+const deleteDetail = async (req, res) => {
+    try {
+        const { id_detalle } = req.params;
+        if (!id_detalle)
+            return res.status(400).json({ message: 'El id del detalle es requerido.' });
+
+        const result = await SalesModel.deleteDatail(id_detalle);
+        return res.status(200).json(result);
+    } catch (error) {
+        console.error('Error en deleteDatail: ', error.message);
+        res.status(500).json({ message: 'Error al eliminar la venta.', error: error.message });
+    }
+}
+
 export default {
     getSales,
+    getSaleDetails,
     postSale,
     updateSale,
-    deleteSale
+    deleteSale,
+    deleteDetail
 }
