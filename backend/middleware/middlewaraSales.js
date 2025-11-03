@@ -32,10 +32,6 @@ const validateSale = [
             return true;
         }),
 
-    body('saleInfo.precio_unitario')
-        .notEmpty().withMessage('El precio unitario es obligatorio.')
-        .isFloat({ gt: 0 }).withMessage('El precio unitario debe ser mayor que 0.'),
-
     (req, res, next) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {

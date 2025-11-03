@@ -7,44 +7,47 @@ const SalesModel = {
         try {
             await connection.beginTransaction();
 
-            const { 
-                fecha_venta, 
-                id_cliente, 
-                id_producto, 
-                cantidad
-            } = saleInfo;
+            const { fecha_venta, id_cliente, productos } = saleInfo;
 
-            const [result] = await connection.query(`
-                SELECT precio_unitario FROM Productos WHERE id_producto = ? AND id_tienda = ?;
-            `, [id_producto, id_tienda]);
+            if (!productos || productos.length === 0)
+                throw new Error('Debe incluir al menos un producto en la venta.');
 
-            if (result.length === 0)
-                throw new Error('El producto no existe o no pertenece a esta tienda.');
+            let totalVenta = 0;
 
-            const { precio_unitario } = result[0];
+            for (const { id_producto, cantidad } of productos) {
+                const [result] = await connection.query(`
+                    SELECT precio_unitario
+                    FROM Productos
+                    WHERE id_producto = ? AND id_tienda = ?;
+                `, [id_producto, id_tienda]);
 
-            const total = precio_unitario * cantidad;
+                if (result.length === 0) 
+                    throw new Error(`El producto con ID ${id_producto} no existe o no pertenece a esta tienda.`);
 
-            const [resultVenta] = await connection.query(`
+                const { precio_unitario } = result[0];
+                totalVenta += precio_unitario * cantidad;
+            }
+
+            const [ventaResult] = await connection.query(`
                 INSERT INTO Ventas (fecha_venta, id_cliente, id_tienda, total)
-                VALUES (?, ?, ?, ?); 
-            `, [fecha_venta, id_cliente, id_tienda, total]);
+                VALUES (?,?,?,?);
+            `, [fecha_venta, id_cliente, id_tienda, totalVenta]);
 
-            const id_venta = resultVenta.insertId;
+            const id_venta = ventaResult.insertId;
 
-            await connection.query(`
-                INSERT INTO Detalle_Ventas (id_venta, id_producto, cantidad, precio_unitario)
-                VALUES (?, ?, ?, ?);
-            `, [id_venta, id_producto, cantidad, precio_unitario]);
+            for (const { id_producto, cantidad } of productos) {
+                await connection.query(`
+                    INSERT INTO Detalle_Ventas (id_venta, id_producto, cantidad)
+                    VALUES (?,?,?);
+                `, [id_venta, id_producto, cantidad]);
+            }
 
             await connection.commit();
-            return { message: 'Venta agregada con éxito.', ventaId: id_venta, precio_u: precio_unitario };
+            return { message: 'Venta agregada con éxito.', ventaId: id_venta };
         } catch (error) {
-            
             console.error('Error en postSale: ', error.message);
             await connection.rollback();
             throw error;
-
         } finally {
             connection.release();
         }
@@ -181,6 +184,30 @@ const SalesModel = {
             return { message: 'Detalle eliminado.' }
         } catch (error) {
             console.error('Error en deleteDatail: ', error.message);
+            throw error;
+        }
+    },
+
+    getProducts: async (id_tienda) => {
+        try {
+            const [rows] = await db.query(`
+                SELECT 
+                    id_producto,
+                    nombre,
+                    descripcion,
+                    precio_compra,
+                    porcentaje_ganancia,
+                    precio_venta,
+                    stock,
+                    stock_minimo,
+                    precio_unitario
+                FROM Productos
+                WHERE id_tienda = ? AND stock > 0;
+            `, [id_tienda]);
+
+            return rows;
+        } catch (error) {
+            console.error('Error en getProducts: ', error.message);
             throw error;
         }
     }

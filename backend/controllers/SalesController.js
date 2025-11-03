@@ -95,6 +95,20 @@ const deleteDetail = async (req, res) => {
         console.error('Error en deleteDatail: ', error.message);
         res.status(500).json({ message: 'Error al eliminar la venta.', error: error.message });
     }
+};
+
+const getProducts = async (req, res) => {
+    try {
+        const { id_tienda } = req.params;
+        if (!id_tienda)
+            return res.status(400).json({ message: 'El id de la tineda es requerido.' });
+
+        const result = await SalesModel.getProducts(id_tienda);
+        return res.status(200).json(result);
+    } catch (error) {
+        console.error('Error en getProducts: ', error.message);
+        res.status(500).json({ message: 'Error al extraer los productos.', error: error.message });
+    }
 }
 
 export default {
@@ -103,5 +117,6 @@ export default {
     postSale,
     updateSale,
     deleteSale,
-    deleteDetail
+    deleteDetail,
+    getProducts
 }

@@ -4,9 +4,10 @@ import { validateSale } from '../middleware/middlewaraSales.js';
 
 const Route = express.Router();
 
-Route.post('/postSale/:id_tienda', validateSale, SalesController.postSale);
+Route.post('/postSale/:id_tienda', SalesController.postSale);
 Route.get('/getSales/:id_tienda', SalesController.getSales);
 Route.get('/getSaleDetails/:id_venta', SalesController.getSaleDetails);
+Route.get('/getProducts/:id_tienda', SalesController.getProducts)
 Route.put('/updateSale/:id_venta', SalesController.updateSale); 
 Route.delete('/deleteSale/:id_venta', SalesController.deleteSale);
 Route.delete('/deleteDetail/:id_detalle', SalesController.deleteDetail);
