@@ -61,7 +61,7 @@ export default function Ventas() {
         API.get(`/ant-box/sales/getSales/${store.id_tienda}?page=${page}&limit=${limit}`)
             .then((response) => {
                 setSale(response?.data?.rows);
-                setTotal(response?.data?.total);
+                setTotal(response?.data?.totalCount);
             })
             .catch(error => console.error(error));
     }, [store.id_tienda, page, refresh])
