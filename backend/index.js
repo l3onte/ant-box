@@ -6,7 +6,10 @@ import cors from 'cors';
 import usersRoutes from './routes/usersRoutes.js' 
 import storeRoutes from './routes/storeRoutes.js'
 import sellerRoutes from './routes/SellersRoutes.js'
-import supplierRoutes from './routes/suppliersRoutes.js';
+import supplierRoutes from './routes/suppliersRoutes.js'
+import inventoryRoutes from './routes/InventoryRoutes.js'
+import saleRoutes from './routes/salesRoutes.js';
+import customerRoutes from './routes/customersRoutes.js';
 
 dotenv.config();
 const PORT = process.env.PORT || 3000;
@@ -38,6 +41,9 @@ app.use('/ant-box/users', usersRoutes);
 app.use('/ant-box/store', storeRoutes);
 app.use('/ant-box/sellers', sellerRoutes);
 app.use('/ant-box/suppliers', supplierRoutes);
+app.use('/ant-box/inventory', inventoryRoutes);
+app.use('/ant-box/sales', saleRoutes);
+app.use('/ant-box/customers', customerRoutes);
 
 app.listen(PORT, () => {
     console.log(`Server is running on: ${PORT}`);

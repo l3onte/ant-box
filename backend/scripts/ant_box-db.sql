@@ -77,6 +77,7 @@ CREATE TABLE Productos (
  precio_venta DECIMAL(10,2),
  stock INT NOT NULL,
  stock_minimo INT NOT NULL,
+ precio_unitario DECIMAL(10,2) NOT NULL,
  id_proveedor INT,
  id_tienda INT NOT NULL,
 
@@ -130,7 +131,6 @@ CREATE TABLE Detalle_Ventas (
  id_venta INT NOT NULL,
  id_producto INT NOT NULL,
  cantidad INT NOT NULL,
- precio_unitario DECIMAL(10,2) NOT NULL,
 
  CONSTRAINT pk_detalle_ventas PRIMARY KEY (id_detalle),
  CONSTRAINT fk_detalle_venta FOREIGN KEY (id_venta)
