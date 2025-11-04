@@ -23,7 +23,7 @@ export default function FormVentas() {
 
     useEffect(() => {
         API.get(`/ant-box/customers/getCustomers/${store.id_tienda}`)
-            .then((res) => setCustomers(res.data))
+            .then((res) => setCustomers(res.data.rows || []))
             .catch(console.error);
     }, [store.id_tienda]);
 
