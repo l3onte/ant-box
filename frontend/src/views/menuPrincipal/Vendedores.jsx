@@ -26,6 +26,7 @@ export default function Vendedores() {
     const [refresh, setRefresh] = useState(false);
     const [isEditModalOpen, setEditModal] = useState(false);
     const [selectedSeller, setSelectedSeller] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
 
     const handleDelete = async (id) => {
         const result = await Swal.fire({
@@ -100,13 +101,13 @@ export default function Vendedores() {
     const { store } = useStore();
 
     useEffect(() => {
-        API.get(`/ant-box/sellers/getSellers/${store.id_tienda}?page=${page}&limit=${limit}`)
+        API.get(`/ant-box/sellers/getSellers/${store.id_tienda}?page=${page}&limit=${limit}&search=${searchTerm}`)
             .then((response) => {
                 setSellersData(response.data.rows);
                 setTotal(response.data.total);
             })
             .catch(error => console.error(error));
-    }, [store.id_tienda, page, refresh])
+    }, [store.id_tienda, page, refresh, searchTerm])
 
     return (
         <ModuleLayout 
@@ -118,7 +119,9 @@ export default function Vendedores() {
                 />
             )}
         >
-            <TableControls />
+            <TableControls 
+                onSearch={(value) => setSearchTerm(value)}
+            />
             <Table columns={columns} data={sellersData} />
             <Pagination 
                 page={page}
