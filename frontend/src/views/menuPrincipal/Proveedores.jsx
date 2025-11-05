@@ -18,6 +18,7 @@ export default function Productos() {
     const [total, setTotal] = useState(0);
     const [isEditModalOpen, setEditModal] = useState(false);
     const [selectedSupplier, setSelectedSupplier] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
 
     const moduleInfo = {
         title: 'Proveedores',
@@ -28,13 +29,13 @@ export default function Productos() {
     }
 
     useEffect(() => {
-        API.get(`/ant-box/suppliers/getSuppliers/${store.id_tienda}?page=${page}&limit=${limit}`)
+        API.get(`/ant-box/suppliers/getSuppliers/${store.id_tienda}?page=${page}&limit=${limit}&search=${searchTerm}`)
             .then((response) => {
                 setSuppliersData(response.data.result);
                 setTotal(response.data.total);
             })
             .catch(error => console.error(error.message));
-    }, [store.id_tienda, page, refresh]);
+    }, [store.id_tienda, page, refresh, searchTerm]);
 
     const handleEdit = (supplier) => {
         setSelectedSupplier(supplier);
@@ -90,7 +91,9 @@ export default function Productos() {
                 />
             )}
         >
-            <TableControls />
+            <TableControls 
+                onSearch={(value) => setSearchTerm(value)}
+            />
             <Table columns={columns} data={suppliersData}/>
             <Pagination 
                 page={page} 
