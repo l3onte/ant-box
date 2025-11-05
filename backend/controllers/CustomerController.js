@@ -3,11 +3,11 @@ import CustomerModel from '../models/customerModel.js';
 const getCustomers = async (req, res) => {
     try {
         const { id_tienda } = req.params;
-        const { page = 1, limit = 5 } = req.query;
+        const { page = 1, limit = 5, search = '' } = req.query;
         if (!id_tienda)
             return res.status(400).json({ message: 'El id de la tienda es requerido.' });
 
-        const result = await CustomerModel.getCustomers(id_tienda, Number(page), Number(limit));
+        const result = await CustomerModel.getCustomers(id_tienda, Number(page), Number(limit), search);
         return res.status(200).json(result);
     } catch (error) {
         res.status(500).json({ message: error.message });

@@ -1,8 +1,9 @@
 import db from '../config/db.js';
 
 const CustomerModel = {
-    getCustomers: async (id_tienda, page, limit) => {
+    getCustomers: async (id_tienda, page, limit, search = '') => {
         const offset = (page - 1) * limit;
+        const searchFilter = `%${search}%`
 
         try {
             const [rows] = await db.query(`
@@ -14,8 +15,15 @@ const CustomerModel = {
                     email
                 FROM Clientes
                 WHERE id_tienda = ?
+                    AND (
+                        id_cliente LIKE ?
+                        OR nombre LIKE ?
+                        OR direccion LIKE ?
+                        OR telefono LIKE ?
+                        OR email LIKE ?
+                    )
                 LIMIT ? OFFSET ?;
-            `, [id_tienda, limit, offset]);
+            `, [id_tienda, searchFilter, searchFilter, searchFilter, searchFilter, searchFilter, limit, offset]);
 
             const [countResult] = await db.query(`
                 SELECT COUNT(*) AS Total FROM Clientes WHERE id_tienda = ?;

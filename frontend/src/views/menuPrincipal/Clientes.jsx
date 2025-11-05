@@ -23,6 +23,7 @@ export default function Clientes() {
     const [refresh, setRefresh] = useState(false);    
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const [searchTerm, setSerchTerm] = useState('');
 
     const columns = [
         { header: 'id', accessor: 'id_cliente' },
@@ -45,13 +46,13 @@ export default function Clientes() {
     ]
 
     useEffect(() => {
-        API.get(`/ant-box/customers/getCustomers/${store.id_tienda}?page=${page}&limit=${limit}`)
+        API.get(`/ant-box/customers/getCustomers/${store.id_tienda}?page=${page}&limit=${limit}&search=${searchTerm}`)
             .then((response) => {
                 setCustomers(response?.data?.rows);
                 setTotal(response?.data?.total);
             })
             .catch(error => console.error(error));
-    }, [store.id_tienda, page, refresh]);
+    }, [store.id_tienda, page, refresh, searchTerm]);
 
     const handleEdit = (customer) => {
         setSelectedCustomer(customer);
@@ -62,7 +63,9 @@ export default function Clientes() {
         <ModuleLayout 
             moduleInfo={moduleInfo}
         >
-            <TableControls />
+            <TableControls 
+                onSearch={(value) => setSerchTerm(value)}
+            />
             <Table 
                 columns={columns}
                 data={customers}
