@@ -53,8 +53,9 @@ const SalesModel = {
         }
     }, 
 
-    getSale: async (id_tienda, page, limit) => {
+    getSale: async (id_tienda, page, limit, search = '') => {
         const offset = (page - 1) * limit;
+        const searchFilter = `%${search}%`;
 
         try {
         const [rows] = await db.query(`
@@ -69,16 +70,25 @@ const SalesModel = {
             INNER JOIN Clientes c ON c.id_cliente = v.id_cliente
             INNER JOIN Productos p ON p.id_producto = dv.id_producto
             WHERE v.id_tienda = ?
+                AND (
+                    c.nombre LIKE ? 
+                    OR v.id_venta LIKE ?
+                )
             GROUP BY v.id_venta, c.nombre, v.fecha_venta
             ORDER BY v.fecha_venta DESC
             LIMIT ? OFFSET ?;
-        `, [id_tienda, limit, offset]);
+        `, [id_tienda, searchFilter, searchFilter, limit, offset]);
 
-            const [[{ totalCount }]] = await db.query(`
-                SELECT COUNT(*) AS total 
-                FROM Ventas
-                WHERE id_tienda = ?;
-            `, [id_tienda]);
+        const [[{ totalCount }]] = await db.query(`
+            SELECT COUNT(DISTINCT v.id_venta) AS total
+            FROM Ventas v
+            INNER JOIN Clientes c ON c.id_cliente = v.id_cliente
+            WHERE v.id_tienda = ?
+                AND (
+                    c.nombre LIKE ?
+                    OR v.id_venta LIKE ?
+                );
+        `, [id_tienda, searchFilter, searchFilter]);
 
             return { rows, totalCount };
         } catch (error) {

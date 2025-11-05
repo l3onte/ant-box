@@ -5,9 +5,7 @@ import ModuleLayout from "../../components/layout-components/ModuleLayout"
 import Table from "../../components/layout-components/Table.jsx"
 import { Trash2, Edit } from 'lucide-react'
 import Pagination from "../../components/layout-components/table-components/Pagination.jsx"
-import Search from "../../components/layout-components/table-components/Search.jsx"
-import FilterButton from "../../components/layout-components/table-components/FilterButton.jsx"
-import SortButton from "../../components/layout-components/table-components/SortButton.jsx"
+import TableControls from "../../components/layout-components/table-components/TableControls.jsx"
 import Swal from 'sweetalert2'
 import FormVendedor from "../../components/forms/FormVendedor.jsx"
 import Modal from "../../components/Modal.jsx"
@@ -120,14 +118,7 @@ export default function Vendedores() {
                 />
             )}
         >
-            <div className="flex w-full justify-between">
-                <Search />
-                
-                <div className="flex gap-2">
-                    <FilterButton />
-                    <SortButton />
-                </div>
-            </div>
+            <TableControls />
             <Table columns={columns} data={sellersData} />
             <Pagination 
                 page={page}

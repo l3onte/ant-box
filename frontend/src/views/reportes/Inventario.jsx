@@ -2,9 +2,7 @@ import { useEffect, useState } from "react";
 import ModuleLayout from "../../components/layout-components/ModuleLayout";
 import Table from '../../components/layout-components/Table';
 import Pagination from "../../components/layout-components/table-components/Pagination";
-import Search from "../../components/layout-components/table-components/Search";
-import FilterButton from "../../components/layout-components/table-components/FilterButton";
-import SortButton from "../../components/layout-components/table-components/SortButton";
+import TableControls from "../../components/layout-components/table-components/TableControls";
 import API from "../../services/API";
 import { useStore } from "../../services/storeContext";
 import { Menu } from "lucide-react";
@@ -13,7 +11,7 @@ export default function Inventario() {
     const { store } = useStore();
 
     const [page, setPage] = useState(1);
-    const [limit] = useState(10);
+    const [limit] = useState(5);
     const [total, setTotal] = useState(0);
     const [inventory, setInventory] = useState([]);
 
@@ -66,14 +64,7 @@ export default function Inventario() {
         <ModuleLayout
             moduleInfo={moduleInfo}
         >
-            <div className="flex w-full justify-between">
-                <Search />
-                
-                <div className="flex gap-2">
-                    <FilterButton />
-                    <SortButton />
-                </div>
-            </div>
+            <TableControls />
             <Table
             columns={columns}
             data={inventory}

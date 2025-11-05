@@ -3,12 +3,10 @@ import { useStore } from "../../services/storeContext";
 import API from "../../services/API";
 import ModuleLayout from "../../components/layout-components/ModuleLayout"
 import Table from "../../components/layout-components/Table";
-import Search from "../../components/layout-components/table-components/Search";
-import FilterButton from "../../components/layout-components/table-components/FilterButton";
-import SortButton from "../../components/layout-components/table-components/SortButton";
+import TableControls from "../../components/layout-components/table-components/TableControls";
 import Pagination from "../../components/layout-components/table-components/Pagination";
 import FormProveedor from '../../components/forms/FormProveedor';
-import { Trash2, Edit } from "lucide-react";
+import { Edit } from "lucide-react";
 import Modal from "../../components/Modal";
 
 export default function Productos() {
@@ -92,14 +90,7 @@ export default function Productos() {
                 />
             )}
         >
-            <div className="flex w-full justify-between">
-                <Search />
-                
-                <div className="flex gap-2">
-                    <FilterButton />
-                    <SortButton />
-                </div>
-            </div>
+            <TableControls />
             <Table columns={columns} data={suppliersData}/>
             <Pagination 
                 page={page} 
