@@ -14,6 +14,7 @@ export default function Inventario() {
     const [limit] = useState(5);
     const [total, setTotal] = useState(0);
     const [inventory, setInventory] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
 
     const moduleInfo = {
         title: 'Inventario',
@@ -53,18 +54,20 @@ export default function Inventario() {
     ]
 
     useEffect(() => {
-        API.get(`/ant-box/inventory/getInventory/${store.id_tienda}`)
+        API.get(`/ant-box/inventory/getInventory/${store.id_tienda}?page=${page}&limit=${limit}&search=${searchTerm}`)
             .then((response) => {
                 setInventory(response?.data?.rows);
                 setTotal(response?.data?.total);
             })
-    }, [store.id_tienda, page, limit])
+    }, [store.id_tienda, page, limit, searchTerm])
 
     return (
         <ModuleLayout
             moduleInfo={moduleInfo}
         >
-            <TableControls />
+            <TableControls 
+                onSearch={(value) => setSearchTerm(value)}
+            />
             <Table
             columns={columns}
             data={inventory}
