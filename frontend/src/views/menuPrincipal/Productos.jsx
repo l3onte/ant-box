@@ -1,4 +1,6 @@
-import ModuleLayout from "../../components/layout-components/ModuleLayout"
+import ModuleLayout from "../../components/layout-components/ModuleLayout";
+import TableControls from "../../components/layout-components/table-components/TableControls";
+import Pagination from "../../components/layout-components/table-components/Pagination";
 
 export default function Productos() {
     const moduleInfo = {
@@ -10,6 +12,11 @@ export default function Productos() {
     }
 
     return (
-        <ModuleLayout moduleInfo={moduleInfo} />
+        <ModuleLayout 
+            moduleInfo={moduleInfo}
+        >
+            <TableControls />
+            <Pagination/>
+        </ModuleLayout>
     )
 }
