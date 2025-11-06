@@ -2,9 +2,7 @@ import { useState, useEffect, useEffectEvent } from "react";
 import ModuleLayout from "../../components/layout-components/ModuleLayout";
 import Table from '../../components/layout-components/Table';
 import Pagination from "../../components/layout-components/table-components/Pagination";
-import Search from "../../components/layout-components/table-components/Search";
-import FilterButton from "../../components/layout-components/table-components/FilterButton";
-import SortButton from "../../components/layout-components/table-components/SortButton";
+import TableControls from "../../components/layout-components/table-components/TableControls";
 import API from "../../services/API";
 import { useStore } from "../../services/storeContext";
 import { ChevronDown } from 'lucide-react';
@@ -20,6 +18,9 @@ export default function Ventas() {
     const [refresh, setRefresh] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedSale, setSelectedSale] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
 
     const moduleInfo = {
         title: 'Ventas',
@@ -58,13 +59,13 @@ export default function Ventas() {
     ]
 
     useEffect(() => {
-        API.get(`/ant-box/sales/getSales/${store.id_tienda}?page=${page}&limit=${limit}`)
+        API.get(`/ant-box/sales/getSales/${store.id_tienda}?page=${page}&limit=${limit}&search=${searchTerm}&startDate=${startDate}&endDate=${endDate}`)
             .then((response) => {
                 setSale(response?.data?.rows);
                 setTotal(response?.data?.totalCount);
             })
             .catch(error => console.error(error));
-    }, [store.id_tienda, page, refresh])
+    }, [store.id_tienda, page, refresh, searchTerm, startDate, endDate])
 
     const fetchSaleDetails = async (id_venta) => {
         try {
@@ -86,13 +87,13 @@ export default function Ventas() {
                 />
             )}
         >
-            <div className="flex w-full justify-between">
-                <Search />
-                <div className="flex gap-2">
-                    <FilterButton />
-                    <SortButton />
-                </div>
-            </div>
+            <TableControls 
+                onSearch={(value) => setSearchTerm(value)}
+                onDateRangeChange={(start, end) => {
+                    setStartDate(start);
+                    setEndDate(end);
+                }}
+            />
             <Table 
                 columns={columns} 
                 data={sale}

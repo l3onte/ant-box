@@ -20,12 +20,12 @@ const postSupplier = async (req, res) => {
 const getSuppliers = async (req, res) => {
     try {
         const { id_tienda } = req.params;
-        const { page = 1, limit = 5 } = req.query;
+        const { page = 1, limit = 5, search = '' } = req.query;
         
         if (!id_tienda) 
             return res.status(400).json({ message: 'El id de la tienda es requerido.' });
 
-        const result = await SuppliersModel.getSuppliers(id_tienda, Number(page), Number(limit)); 
+        const result = await SuppliersModel.getSuppliers(id_tienda, Number(page), Number(limit), search); 
 
         if (result.result.length === 0) 
             return res.status(404).json({ message: 'No se encontraron los proveedores de esta tienda.' });

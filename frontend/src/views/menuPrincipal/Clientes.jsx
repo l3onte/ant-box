@@ -1,9 +1,7 @@
 import ModuleLayout from "../../components/layout-components/ModuleLayout"
 import Table from "../../components/layout-components/Table"
 import Pagination from "../../components/layout-components/table-components/Pagination"
-import Search from "../../components/layout-components/table-components/Search"
-import FilterButton from "../../components/layout-components/table-components/FilterButton"
-import SortButton from "../../components/layout-components/table-components/SortButton"
+import TableControls from "../../components/layout-components/table-components/TableControls"
 import { useStore } from "../../services/storeContext"
 import { useState, useEffect } from "react"
 import API from "../../services/API"
@@ -25,6 +23,7 @@ export default function Clientes() {
     const [refresh, setRefresh] = useState(false);    
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const [searchTerm, setSerchTerm] = useState('');
 
     const columns = [
         { header: 'id', accessor: 'id_cliente' },
@@ -47,13 +46,13 @@ export default function Clientes() {
     ]
 
     useEffect(() => {
-        API.get(`/ant-box/customers/getCustomers/${store.id_tienda}?page=${page}&limit=${limit}`)
+        API.get(`/ant-box/customers/getCustomers/${store.id_tienda}?page=${page}&limit=${limit}&search=${searchTerm}`)
             .then((response) => {
                 setCustomers(response?.data?.rows);
                 setTotal(response?.data?.total);
             })
             .catch(error => console.error(error));
-    }, [store.id_tienda, page, refresh]);
+    }, [store.id_tienda, page, refresh, searchTerm]);
 
     const handleEdit = (customer) => {
         setSelectedCustomer(customer);
@@ -64,14 +63,9 @@ export default function Clientes() {
         <ModuleLayout 
             moduleInfo={moduleInfo}
         >
-            <div className="flex w-full justify-between">
-                <Search />
-
-                <div className="flex gap-2">
-                    <FilterButton />
-                    <SortButton />
-                </div>
-            </div>
+            <TableControls 
+                onSearch={(value) => setSerchTerm(value)}
+            />
             <Table 
                 columns={columns}
                 data={customers}

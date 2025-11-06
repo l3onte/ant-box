@@ -37,9 +37,10 @@ const Sellers = {
         }
     },
 
-    getSellers: async (id, page = 1, limit = 5) => {
+    getSellers: async (id, page = 1, limit = 5, search = '') => {
         const offset = (page - 1) * limit;
-        
+        const searchFilter = `%${search}%`;
+
         try {
             const [rows] = await db.query(`
                 SELECT 
@@ -51,9 +52,16 @@ const Sellers = {
                 FROM Vendedores
                 INNER JOIN Usuarios ON Usuarios.id_usuario = Vendedores.id_usuario
                 WHERE Vendedores.id_tienda = ?
+                    AND (
+                        Usuarios.id_usuario LIKE ?
+                        OR CONCAT(Usuarios.nombre, ' ', Usuarios.apellido) LIKE ?
+                        OR Usuarios.username LIKE ?
+                        OR Usuarios.correo LIKE ?
+                        OR Usuarios.rol LIKE ?
+                    )
                 ORDER BY Vendedor ASC
                 LIMIT ? OFFSET ?;
-            `, [id, limit, offset]);
+            `, [id, searchFilter, searchFilter, searchFilter, searchFilter, searchFilter, limit, offset]);
 
             const [countResult] = await db.query(`
                 SELECT COUNT(*) AS total FROM Vendedores WHERE id_tienda = ?;

@@ -5,9 +5,7 @@ import ModuleLayout from "../../components/layout-components/ModuleLayout"
 import Table from "../../components/layout-components/Table.jsx"
 import { Trash2, Edit } from 'lucide-react'
 import Pagination from "../../components/layout-components/table-components/Pagination.jsx"
-import Search from "../../components/layout-components/table-components/Search.jsx"
-import FilterButton from "../../components/layout-components/table-components/FilterButton.jsx"
-import SortButton from "../../components/layout-components/table-components/SortButton.jsx"
+import TableControls from "../../components/layout-components/table-components/TableControls.jsx"
 import Swal from 'sweetalert2'
 import FormVendedor from "../../components/forms/FormVendedor.jsx"
 import Modal from "../../components/Modal.jsx"
@@ -28,6 +26,7 @@ export default function Vendedores() {
     const [refresh, setRefresh] = useState(false);
     const [isEditModalOpen, setEditModal] = useState(false);
     const [selectedSeller, setSelectedSeller] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
 
     const handleDelete = async (id) => {
         const result = await Swal.fire({
@@ -102,13 +101,13 @@ export default function Vendedores() {
     const { store } = useStore();
 
     useEffect(() => {
-        API.get(`/ant-box/sellers/getSellers/${store.id_tienda}?page=${page}&limit=${limit}`)
+        API.get(`/ant-box/sellers/getSellers/${store.id_tienda}?page=${page}&limit=${limit}&search=${searchTerm}`)
             .then((response) => {
                 setSellersData(response.data.rows);
                 setTotal(response.data.total);
             })
             .catch(error => console.error(error));
-    }, [store.id_tienda, page, refresh])
+    }, [store.id_tienda, page, refresh, searchTerm])
 
     return (
         <ModuleLayout 
@@ -120,14 +119,9 @@ export default function Vendedores() {
                 />
             )}
         >
-            <div className="flex w-full justify-between">
-                <Search />
-                
-                <div className="flex gap-2">
-                    <FilterButton />
-                    <SortButton />
-                </div>
-            </div>
+            <TableControls 
+                onSearch={(value) => setSearchTerm(value)}
+            />
             <Table columns={columns} data={sellersData} />
             <Pagination 
                 page={page}

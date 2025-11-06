@@ -1,8 +1,9 @@
 import db from "../config/db.js";
 
 const InventoryModel = {
-    getInventory: async (id_tienda, page, limit) => {
+    getInventory: async (id_tienda, page, limit, search = '') => {
         const offset = (page - 1) * limit;
+        const searchFilter = `%${search}%`;
 
         try {
             const [rows] = await db.query(`
@@ -36,8 +37,19 @@ const InventoryModel = {
                     GROUP BY id_producto
                 ) dv ON dv.id_producto = p.id_producto
                 WHERE p.id_tienda = ?
+                    AND (
+                        p.id_producto LIKE ?
+                        OR p.nombre LIKE ?
+                        OR p.descripcion LIKE ?
+                        OR p.stock LIKE ?
+                        OR p.stock_minimo LIKE ?
+                        OR p.precio_compra LIKE ?
+                        OR p.precio_venta LIKE ?
+                        OR p.porcentaje_ganancia LIKE ?
+                        OR prov.nombre LIKE ?
+                    )
                 LIMIT ? OFFSET ?;
-            `, [id_tienda, limit, offset]);
+            `, [id_tienda, searchFilter, searchFilter, searchFilter, searchFilter, searchFilter ,searchFilter ,searchFilter, searchFilter, searchFilter,limit, offset]);
 
             const [countResult] = await db.query(`
                 SELECT COUNT(*) AS total FROM Productos WHERE id_tienda = ?;

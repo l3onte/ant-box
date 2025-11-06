@@ -130,7 +130,9 @@ export default function FormVentas() {
                         >
                             <option value="">Producto...</option>
                             {products.map((p) => (
-                                <option key={p.id_producto} value={p.id_producto}>{p.nombre}</option>
+                                <option key={p.id_producto} value={p.id_producto}>
+                                    {p.nombre} | {p.precio_venta} {store.moneda === 'NIO' ? 'C$' : '$'}
+                                </option>
                             ))}
                         </select>
 

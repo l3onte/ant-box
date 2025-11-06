@@ -3,12 +3,10 @@ import { useStore } from "../../services/storeContext";
 import API from "../../services/API";
 import ModuleLayout from "../../components/layout-components/ModuleLayout"
 import Table from "../../components/layout-components/Table";
-import Search from "../../components/layout-components/table-components/Search";
-import FilterButton from "../../components/layout-components/table-components/FilterButton";
-import SortButton from "../../components/layout-components/table-components/SortButton";
+import TableControls from "../../components/layout-components/table-components/TableControls";
 import Pagination from "../../components/layout-components/table-components/Pagination";
 import FormProveedor from '../../components/forms/FormProveedor';
-import { Trash2, Edit } from "lucide-react";
+import { Edit } from "lucide-react";
 import Modal from "../../components/Modal";
 
 export default function Productos() {
@@ -20,6 +18,7 @@ export default function Productos() {
     const [total, setTotal] = useState(0);
     const [isEditModalOpen, setEditModal] = useState(false);
     const [selectedSupplier, setSelectedSupplier] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
 
     const moduleInfo = {
         title: 'Proveedores',
@@ -30,13 +29,13 @@ export default function Productos() {
     }
 
     useEffect(() => {
-        API.get(`/ant-box/suppliers/getSuppliers/${store.id_tienda}?page=${page}&limit=${limit}`)
+        API.get(`/ant-box/suppliers/getSuppliers/${store.id_tienda}?page=${page}&limit=${limit}&search=${searchTerm}`)
             .then((response) => {
                 setSuppliersData(response.data.result);
                 setTotal(response.data.total);
             })
             .catch(error => console.error(error.message));
-    }, [store.id_tienda, page, refresh]);
+    }, [store.id_tienda, page, refresh, searchTerm]);
 
     const handleEdit = (supplier) => {
         setSelectedSupplier(supplier);
@@ -92,14 +91,9 @@ export default function Productos() {
                 />
             )}
         >
-            <div className="flex w-full justify-between">
-                <Search />
-                
-                <div className="flex gap-2">
-                    <FilterButton />
-                    <SortButton />
-                </div>
-            </div>
+            <TableControls 
+                onSearch={(value) => setSearchTerm(value)}
+            />
             <Table columns={columns} data={suppliersData}/>
             <Pagination 
                 page={page} 
