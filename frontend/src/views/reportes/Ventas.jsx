@@ -19,7 +19,9 @@ export default function Ventas() {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedSale, setSelectedSale] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
- 
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
+
     const moduleInfo = {
         title: 'Ventas',
         route: 'Reportes / Ventas',
@@ -57,13 +59,13 @@ export default function Ventas() {
     ]
 
     useEffect(() => {
-        API.get(`/ant-box/sales/getSales/${store.id_tienda}?page=${page}&limit=${limit}&search=${searchTerm}`)
+        API.get(`/ant-box/sales/getSales/${store.id_tienda}?page=${page}&limit=${limit}&search=${searchTerm}&startDate=${startDate}&endDate=${endDate}`)
             .then((response) => {
                 setSale(response?.data?.rows);
                 setTotal(response?.data?.totalCount);
             })
             .catch(error => console.error(error));
-    }, [store.id_tienda, page, refresh, searchTerm])
+    }, [store.id_tienda, page, refresh, searchTerm, startDate, endDate])
 
     const fetchSaleDetails = async (id_venta) => {
         try {
@@ -87,6 +89,10 @@ export default function Ventas() {
         >
             <TableControls 
                 onSearch={(value) => setSearchTerm(value)}
+                onDateRangeChange={(start, end) => {
+                    setStartDate(start);
+                    setEndDate(end);
+                }}
             />
             <Table 
                 columns={columns} 

@@ -3,7 +3,7 @@ import FilterButton from "./FilterButton"
 import SortButton from "./SortButton"
 import PaginationSelect from "./PaginationSelect"
 
-export default function TableControls({ onSearch, onSort }) {
+export default function TableControls({ onSearch, onSort, onDateRangeChange }) {
     return (
         <div className="flex w-full justify-between">
             <Search 
@@ -11,7 +11,9 @@ export default function TableControls({ onSearch, onSort }) {
             />
             <div className="flex gap-2">
                 <PaginationSelect />
-                <FilterButton />
+                <FilterButton 
+                    onDateRangeChange={onDateRangeChange}
+                />
                 <SortButton />
             </div>
         </div>

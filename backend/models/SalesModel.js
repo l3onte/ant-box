@@ -53,7 +53,7 @@ const SalesModel = {
         }
     }, 
 
-    getSale: async (id_tienda, page, limit, search = '') => {
+    getSale: async (id_tienda, page, limit, search = '', startDate = null, endDate = null) => {
         const offset = (page - 1) * limit;
         const searchFilter = `%${search}%`;
 
@@ -74,23 +74,45 @@ const SalesModel = {
                     c.nombre LIKE ? 
                     OR v.id_venta LIKE ?
                 )
+                AND (
+                    (? IS NULL OR v.fecha_venta >= ?)
+                    AND
+                    (? IS NULL OR v.fecha_venta <= ?)
+                )
             GROUP BY v.id_venta, c.nombre, v.fecha_venta
             ORDER BY v.fecha_venta DESC
             LIMIT ? OFFSET ?;
-        `, [id_tienda, searchFilter, searchFilter, limit, offset]);
+        `, [
+                id_tienda,  
+                searchFilter, 
+                searchFilter,
+                startDate, startDate,
+                endDate, endDate, 
+                limit, 
+                offset
+            ]);
 
-        const [[{ totalCount }]] = await db.query(`
-            SELECT COUNT(DISTINCT v.id_venta) AS total
-            FROM Ventas v
-            INNER JOIN Clientes c ON c.id_cliente = v.id_cliente
-            WHERE v.id_tienda = ?
-                AND (
-                    c.nombre LIKE ?
-                    OR v.id_venta LIKE ?
-                );
-        `, [id_tienda, searchFilter, searchFilter]);
 
-            return { rows, totalCount };
+            const [[{ total }]] = await db.query(`
+                SELECT COUNT(DISTINCT v.id_venta) AS total
+                FROM Ventas v
+                INNER JOIN Clientes c ON c.id_cliente = v.id_cliente
+                WHERE v.id_tienda = ?
+                    AND (c.nombre LIKE ? OR v.id_venta LIKE ?)
+                    AND (
+                        (? IS NULL OR v.fecha_venta >= ?)
+                        AND
+                        (? IS NULL OR v.fecha_venta <= ?)
+                    );
+            `, [
+                id_tienda, 
+                searchFilter, 
+                searchFilter,
+                startDate, startDate, 
+                endDate, endDate
+            ]);
+
+            return { rows, totalCount: total };
         } catch (error) {
             console.error('Error en getSale: ', error.message);
             throw error;
