@@ -19,8 +19,9 @@ const Suppliers = {
         }
     },
 
-    getSuppliers: async (id_tienda, page = 1, limit = 5) => {
+    getSuppliers: async (id_tienda, page = 1, limit = 5, search = '') => {
         const offset = (page - 1) * limit;
+        const searchFilter = `%${search}%`;
 
         try {
             const [result] = await db.query(`
@@ -33,8 +34,16 @@ const Suppliers = {
                     status
                 FROM Proveedores
                 WHERE id_tienda = ?
+                    AND (
+                        id_proveedor LIKE ?
+                        OR nombre LIKE ?
+                        OR direccion LIKE ?
+                        OR telefono LIKE ?
+                        OR email LIKE ?
+                        OR status LIKE ?
+                    )
                 LIMIT ? OFFSET ?;
-            `, [id_tienda, limit, offset]);
+            `, [id_tienda, searchFilter, searchFilter, searchFilter, searchFilter, searchFilter, searchFilter,limit, offset]);
 
             const [countResult] = await db.query(`
                 SELECT COUNT(*) AS total FROM Proveedores WHERE id_tienda = ?;

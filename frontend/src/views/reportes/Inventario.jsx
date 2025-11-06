@@ -2,9 +2,7 @@ import { useEffect, useState } from "react";
 import ModuleLayout from "../../components/layout-components/ModuleLayout";
 import Table from '../../components/layout-components/Table';
 import Pagination from "../../components/layout-components/table-components/Pagination";
-import Search from "../../components/layout-components/table-components/Search";
-import FilterButton from "../../components/layout-components/table-components/FilterButton";
-import SortButton from "../../components/layout-components/table-components/SortButton";
+import TableControls from "../../components/layout-components/table-components/TableControls";
 import API from "../../services/API";
 import { useStore } from "../../services/storeContext";
 import { Menu } from "lucide-react";
@@ -13,9 +11,10 @@ export default function Inventario() {
     const { store } = useStore();
 
     const [page, setPage] = useState(1);
-    const [limit] = useState(10);
+    const [limit] = useState(5);
     const [total, setTotal] = useState(0);
     const [inventory, setInventory] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
 
     const moduleInfo = {
         title: 'Inventario',
@@ -55,25 +54,20 @@ export default function Inventario() {
     ]
 
     useEffect(() => {
-        API.get(`/ant-box/inventory/getInventory/${store.id_tienda}`)
+        API.get(`/ant-box/inventory/getInventory/${store.id_tienda}?page=${page}&limit=${limit}&search=${searchTerm}`)
             .then((response) => {
                 setInventory(response?.data?.rows);
                 setTotal(response?.data?.total);
             })
-    }, [store.id_tienda, page, limit])
+    }, [store.id_tienda, page, limit, searchTerm])
 
     return (
         <ModuleLayout
             moduleInfo={moduleInfo}
         >
-            <div className="flex w-full justify-between">
-                <Search />
-                
-                <div className="flex gap-2">
-                    <FilterButton />
-                    <SortButton />
-                </div>
-            </div>
+            <TableControls 
+                onSearch={(value) => setSearchTerm(value)}
+            />
             <Table
             columns={columns}
             data={inventory}
