@@ -9,6 +9,7 @@ const ProductsModel = {
             const [rows] = await db.query(`
                 SELECT 
                     p.id_producto,
+                    p.id_proveedor,
                     p.nombre,
                     p.descripcion,
                     p.precio_compra,
@@ -19,7 +20,7 @@ const ProductsModel = {
                     p.precio_unitario,
                     pv.nombre AS proveedor
                 FROM Productos p
-                INNER JOIN Proveedores pv ON pv.id_proveedor = p.id_proveedor
+                LEFT JOIN Proveedores pv ON pv.id_proveedor = p.id_proveedor
                 WHERE p.id_tienda = ?
                     AND (
                         p.id_producto LIKE ?
@@ -49,7 +50,8 @@ const ProductsModel = {
             );
 
             const [[{ total }]] = await db.query(`
-                SELECT COUNT(*) AS total FROM Productos WHERE id_tienda = ?; 
+                SELECT COUNT(*) AS total FROM Productos 
+                WHERE id_tienda = ?; 
             `, [id_tienda]);
  
             return { rows, total }
@@ -95,13 +97,13 @@ const ProductsModel = {
 
     updateProduct: async (id_producto, data) => {
         try {
-            const { nombre, descripcion, precio_compra, porcentaje_ganancia, stock, stock_minimo, id_proveedor } = data;
+            const { nombre, descripcion, precio_compra, porcentaje_ganancia, id_proveedor } = data;
 
             const [result] = await db.query(`
                 UPDATE Productos
-                SET nombre = ?, descripcion = ?, precio_compra = ?, porcentaje_ganancia = ?, stock = ?, stock_minimo = ?, id_proveedor = ?
+                SET nombre = ?, descripcion = ?, precio_compra = ?, porcentaje_ganancia = ?, id_proveedor = ?
                 WHERE id_producto = ?;
-            `, [nombre, descripcion, precio_compra, porcentaje_ganancia, stock, stock_minimo, id_proveedor, id_producto]);
+            `, [nombre, descripcion, precio_compra, porcentaje_ganancia, id_proveedor, id_producto]);
 
             if (result.affectedRows === 0) 
                 return new Error('No se encontró el producto a actualizar.');

@@ -14,7 +14,7 @@ export default function Productos() {
     const [suppliersData, setSuppliersData] = useState([]);
     const [refresh, setRefresh] = useState(false);
     const [page, setPage] = useState(1);
-    const [limit] = useState(10);
+    const [limit] = useState(6);
     const [total, setTotal] = useState(0);
     const [isEditModalOpen, setEditModal] = useState(false);
     const [selectedSupplier, setSelectedSupplier] = useState(null);
