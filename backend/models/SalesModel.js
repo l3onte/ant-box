@@ -53,9 +53,10 @@ const SalesModel = {
         }
     }, 
 
-    getSale: async (id_tienda, page, limit, search = '', startDate = null, endDate = null) => {
+    getSale: async (id_tienda, page, limit, search = '', startDate = null, endDate = null, sort = 'ASC') => {
         const offset = (page - 1) * limit;
         const searchFilter = `%${search}%`;
+        const order = sort.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
 
         try {
         const [rows] = await db.query(`
@@ -80,7 +81,7 @@ const SalesModel = {
                     (? IS NULL OR v.fecha_venta <= ?)
                 )
             GROUP BY v.id_venta, c.nombre, v.fecha_venta
-            ORDER BY v.fecha_venta DESC
+            ORDER BY c.nombre ${order}
             LIMIT ? OFFSET ?;
         `, [
                 id_tienda,  

@@ -23,7 +23,7 @@ const postSale = async (req ,res) => {
 const getSales = async (req, res) => {
     try {   
         const { id_tienda } = req.params;
-        let { page = 1, limit = 5, search = '', startDate, endDate } = req.query;
+        let { page = 1, limit = 5, search = '', startDate, endDate, sort = 'ASC' } = req.query;
 
         startDate = startDate && startDate.trim() !== '' ? startDate : null;
         endDate = endDate && endDate.trim() !== '' ? endDate : null;
@@ -37,7 +37,8 @@ const getSales = async (req, res) => {
                                                 Number(limit), 
                                                 search, 
                                                 startDate, 
-                                                endDate
+                                                endDate,
+                                                sort
                                             );
         return res.status(200).json(result);
     } catch (error) {

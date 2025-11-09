@@ -24,6 +24,7 @@ export default function Clientes() {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [searchTerm, setSerchTerm] = useState('');
+    const [sortOrder, setSortOrder] = useState('ASC');
 
     const columns = [
         { header: 'id', accessor: 'id_cliente' },
@@ -46,13 +47,13 @@ export default function Clientes() {
     ]
 
     useEffect(() => {
-        API.get(`/ant-box/customers/getCustomers/${store.id_tienda}?page=${page}&limit=${limit}&search=${searchTerm}`)
+        API.get(`/ant-box/customers/getCustomers/${store.id_tienda}?page=${page}&limit=${limit}&search=${searchTerm}&sort=${sortOrder}`)
             .then((response) => {
                 setCustomers(response?.data?.rows);
                 setTotal(response?.data?.total);
             })
             .catch(error => console.error(error));
-    }, [store.id_tienda, page, limit, refresh, searchTerm]);
+    }, [store.id_tienda, page, limit, refresh, searchTerm, sortOrder]);
 
     const handleEdit = (customer) => {
         setSelectedCustomer(customer);
@@ -65,6 +66,7 @@ export default function Clientes() {
         >
             <TableControls 
                 onSearch={(value) => setSerchTerm(value)}
+                onSort={(order) => setSortOrder(order)}
                 useSearch={true}
                 useSort={true}
                 ExcelModule={'customers'}

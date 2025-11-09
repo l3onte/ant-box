@@ -15,6 +15,7 @@ export default function Inventario() {
     const [total, setTotal] = useState(0);
     const [inventory, setInventory] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
+    const [sortOrder, setSortOrder] = useState('ASC');
 
     const moduleInfo = {
         title: 'Inventario',
@@ -54,12 +55,12 @@ export default function Inventario() {
     ]
 
     useEffect(() => {
-        API.get(`/ant-box/inventory/getInventory/${store.id_tienda}?page=${page}&limit=${limit}&search=${searchTerm}`)
+        API.get(`/ant-box/inventory/getInventory/${store.id_tienda}?page=${page}&limit=${limit}&search=${searchTerm}&sort=${sortOrder}`)
             .then((response) => {
                 setInventory(response?.data?.rows);
                 setTotal(response?.data?.total);
             })
-    }, [store.id_tienda, page, limit, searchTerm])
+    }, [store.id_tienda, page, limit, searchTerm, sortOrder])
 
     return (
         <ModuleLayout
@@ -67,6 +68,7 @@ export default function Inventario() {
         >
             <TableControls 
                 onSearch={(value) => setSearchTerm(value)}
+                onSort={(order) => setSortOrder(order)}
                 useSearch={true}
                 useSort={true}
                 ExcelModule={'inventory'}

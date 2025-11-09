@@ -1,9 +1,10 @@
 import db from "../config/db.js";
 
 const PurchaseModel = {
-    getPurchases: async (id_tienda, page, limit, search = '', startDate = null, endDate = null) => {
+    getPurchases: async (id_tienda, page, limit, search = '', startDate = null, endDate = null, sort = 'ASC') => {
         const offset = (page - 1) * limit;
         const searchFilter = `%${search}%`;
+        const order = sort.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
 
         try {
             const [rows] = await db.query(`
@@ -29,7 +30,7 @@ const PurchaseModel = {
                         AND
                         (? IS NULL OR c.fecha_compra <= ?)
                     )
-                ORDER BY c.fecha_compra DESC
+                ORDER BY pv.nombre ${order}
                 LIMIT ? OFFSET ?;
             `, [id_tienda, searchFilter, searchFilter, startDate, startDate, endDate, endDate, limit, offset]);
 

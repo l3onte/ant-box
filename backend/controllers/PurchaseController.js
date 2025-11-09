@@ -5,7 +5,7 @@ import ExcelJS from 'exceljs';
 const getPurchases = async (req, res) => {
     try {
         const { id_tienda } = req.params;
-        let { page = 1, limit = 6, search = '', startDate, endDate } = req.query;
+        let { page = 1, limit = 6, search = '', startDate, endDate, sort = 'ASC' } = req.query;
 
         startDate = startDate && startDate.trim() !== '' ? startDate: null;
         endDate = endDate && endDate.trim() !== '' ? endDate: null;
@@ -19,7 +19,8 @@ const getPurchases = async (req, res) => {
             Number(limit), 
             search,
             startDate,
-            endDate
+            endDate,
+            sort
         );
         res.status(200).json(result);
     } catch (error) {

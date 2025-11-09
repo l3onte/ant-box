@@ -19,6 +19,7 @@ export default function Productos() {
     const [isEditModalOpen, setEditModal] = useState(false);
     const [selectedSupplier, setSelectedSupplier] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
+    const [sortOrder, setSortOrder] = useState('ASC');
 
     const moduleInfo = {
         title: 'Proveedores',
@@ -29,13 +30,13 @@ export default function Productos() {
     }
 
     useEffect(() => {
-        API.get(`/ant-box/suppliers/getSuppliers/${store.id_tienda}?page=${page}&limit=${limit}&search=${searchTerm}`)
+        API.get(`/ant-box/suppliers/getSuppliers/${store.id_tienda}?page=${page}&limit=${limit}&search=${searchTerm}&sort=${sortOrder}`)
             .then((response) => {
                 setSuppliersData(response.data.result);
                 setTotal(response.data.total);
             })
             .catch(error => console.error(error.message));
-    }, [store.id_tienda, page, limit, refresh, searchTerm]);
+    }, [store.id_tienda, page, limit, refresh, searchTerm, sortOrder]);
 
     const handleEdit = (supplier) => {
         setSelectedSupplier(supplier);
@@ -93,6 +94,7 @@ export default function Productos() {
         >
             <TableControls 
                 onSearch={(value) => setSearchTerm(value)}
+                onSort={(order) => setSortOrder(order)}
                 useSearch={true}
                 useSort={true}
                 ExcelModule={'suppliers'}

@@ -21,6 +21,7 @@ export default function Ventas() {
     const [searchTerm, setSearchTerm] = useState('');
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
+    const [sortOrder, setSortOrder] = useState('ASC');
 
     const moduleInfo = {
         title: 'Ventas',
@@ -59,13 +60,13 @@ export default function Ventas() {
     ]
 
     useEffect(() => {
-        API.get(`/ant-box/sales/getSales/${store.id_tienda}?page=${page}&limit=${limit}&search=${searchTerm}&startDate=${startDate}&endDate=${endDate}`)
+        API.get(`/ant-box/sales/getSales/${store.id_tienda}?page=${page}&limit=${limit}&search=${searchTerm}&startDate=${startDate}&endDate=${endDate}&sort=${sortOrder}`)
             .then((response) => {
                 setSale(response?.data?.rows);
                 setTotal(response?.data?.totalCount);
             })
             .catch(error => console.error(error));
-    }, [store.id_tienda, page, limit, refresh, searchTerm, startDate, endDate])
+    }, [store.id_tienda, page, limit, refresh, searchTerm, startDate, endDate, sortOrder])
 
     const fetchSaleDetails = async (id_venta) => {
         try {
@@ -93,6 +94,7 @@ export default function Ventas() {
                     setStartDate(start);
                     setEndDate(end);
                 }}
+                onSort={(order) => setSortOrder(order)}
                 useSearch={true}
                 useSort={true}
                 useFilter={true}

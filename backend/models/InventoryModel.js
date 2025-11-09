@@ -1,9 +1,10 @@
 import db from "../config/db.js";
 
 const InventoryModel = {
-    getInventory: async (id_tienda, page, limit, search = '') => {
+    getInventory: async (id_tienda, page, limit, search = '', sort = 'ASC') => {
         const offset = (page - 1) * limit;
         const searchFilter = `%${search}%`;
+        const order = sort.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
 
         try {
             const [rows] = await db.query(`
@@ -48,6 +49,7 @@ const InventoryModel = {
                         OR p.porcentaje_ganancia LIKE ?
                         OR prov.nombre LIKE ?
                     )
+                ORDER BY p.nombre ${order}
                 LIMIT ? OFFSET ?;
             `, [id_tienda, searchFilter, searchFilter, searchFilter, searchFilter, searchFilter ,searchFilter ,searchFilter, searchFilter, searchFilter,limit, offset]);
 

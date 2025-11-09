@@ -22,6 +22,7 @@ export default function Compras() {
     const [searchTerm, setSearchTerm] = useState('');
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
+    const [sortOrder, setSortOrder] = useState('ASC');
 
     const moduleInfo = {
         title: 'Compras',
@@ -116,13 +117,13 @@ export default function Compras() {
     ];
 
     useEffect(() => {
-        API.get(`/ant-box/purchases/getPurchases/${store.id_tienda}?page=${page}&limit=${limit}&search=${searchTerm}&startDate=${startDate}&endDate=${endDate}`)
+        API.get(`/ant-box/purchases/getPurchases/${store.id_tienda}?page=${page}&limit=${limit}&search=${searchTerm}&startDate=${startDate}&endDate=${endDate}&sort=${sortOrder}`)
             .then((response) => {
                 setPurchases(response?.data?.rows);
                 setTotal(response?.data?.total);
             })
             .catch(error => console.error(error)); 
-    }, [store.id_tienda, page, limit, searchTerm, startDate, endDate, refresh]);
+    }, [store.id_tienda, page, limit, searchTerm, startDate, endDate, refresh, sortOrder]);
 
     return (
         <ModuleLayout 
@@ -137,6 +138,7 @@ export default function Compras() {
             <TableControls 
                 useSearch={true} 
                 onSearch={(value) => setSearchTerm(value)}
+                onSort={(order) => setSortOrder(order)}
                 useSort={true} 
                 useFilter={true}
                 onDateRangeChange={(start, end) => {

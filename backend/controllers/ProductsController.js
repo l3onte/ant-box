@@ -4,12 +4,12 @@ import ExcelJS from 'exceljs';
 const getProducts = async (req, res) => {
     try {
         const { id_tienda } = req.params;
-        const { page = 1, limit = 5, search } = req.query;
+        const { page = 1, limit = 5, search = '', sort = 'ASC' } = req.query;
 
         if (!id_tienda)
             return res.status(400).json({ message: "El id de la tienda es requerido." });
 
-        const result = await ProductsModel.getProducts(id_tienda, Number(page), Number(limit), search);
+        const result = await ProductsModel.getProducts(id_tienda, Number(page), Number(limit), search, sort);
         res.status(200).json(result);
     } catch (error) {
         res.status(500).json({ message: error.message });

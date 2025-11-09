@@ -1,10 +1,11 @@
 import db from "../config/db.js";
 
 const ProductsModel = {
-    getProducts: async (id_tienda, page = 1, limit = 5, search = '') => {
+    getProducts: async (id_tienda, page = 1, limit = 5, search = '', sort = 'ASC') => {
         const offset = (page - 1) * limit;
         const searchFilter = `%${search}%`;
-        
+        const order = sort.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
+
         try {
             const [rows] = await db.query(`
                 SELECT 
@@ -34,6 +35,7 @@ const ProductsModel = {
                         OR p.precio_unitario LIKE ?
                         OR pv.nombre LIKE ?
                     )
+                ORDER BY p.nombre ${order}
                 LIMIT ? OFFSET ?;
             `, [id_tienda, 
                 searchFilter, 

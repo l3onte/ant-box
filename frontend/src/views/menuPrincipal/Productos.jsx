@@ -20,6 +20,7 @@ export default function Productos() {
     const [isEditModalOpen, setEditModal] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [refresh, setRefresh] = useState(false);
+    const [sortOrder, setSortOrder] = useState('ASC');
 
     const moduleInfo = {
         title: 'Productos',
@@ -124,13 +125,13 @@ export default function Productos() {
     ]
 
     useEffect(() => {
-        API.get(`/ant-box/products/getProducts/${store.id_tienda}?page=${page}&limit=${limit}&search=${search}`)
+        API.get(`/ant-box/products/getProducts/${store.id_tienda}?page=${page}&limit=${limit}&search=${search}&sort=${sortOrder}`)
             .then((response) => {
                 setProducts(response?.data?.rows);
                 setTotal(response?.data?.total)
             })
             .catch(error => console.error(error));
-    }, [store.id_tienda, page, limit, search, refresh]);
+    }, [store.id_tienda, page, limit, search, refresh, sortOrder]);
 
     
     const handleEdit = (product) => {
@@ -151,6 +152,7 @@ export default function Productos() {
             <TableControls 
                 useSearch={true}
                 useSort={true}
+                onSort={(order) => setSortOrder(order)}
                 ExcelModule={'products'}
                 ExcelName={'Productos'}
                 route={'products/getProducts'}
