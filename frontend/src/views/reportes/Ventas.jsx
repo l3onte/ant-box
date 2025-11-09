@@ -96,6 +96,8 @@ export default function Ventas() {
                 useSearch={true}
                 useSort={true}
                 useFilter={true}
+                ExcelModule={'sales'}
+                ExcelName={'Ventas'}
             />
             <Table 
                 columns={columns} 

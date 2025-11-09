@@ -5,7 +5,18 @@ import PaginationSelect from "./PaginationSelect"
 import ExcelButton from "./ExcelButton"
 import { useStore } from "../../../services/storeContext";
 
-export default function TableControls({ onSearch, onSort, onDateRangeChange, useSearch = false, useSort = false, showProfit = false, useFilter = false ,gananciasTotales }) {
+export default function TableControls({ 
+        onSearch, 
+        onSort, 
+        onDateRangeChange, 
+        useSearch = false, 
+        useSort = false, 
+        showProfit = false, 
+        useFilter = false ,
+        gananciasTotales,
+        ExcelModule,
+        ExcelName
+}) {
     const { store } = useStore();
 
     return (
@@ -38,7 +49,10 @@ export default function TableControls({ onSearch, onSort, onDateRangeChange, use
                     <SortButton onSort={onSort}/>
                 )}
 
-                <ExcelButton />
+                <ExcelButton 
+                    module={ExcelModule}
+                    name={ExcelName}
+                />
             </div>
         </div>
     )
