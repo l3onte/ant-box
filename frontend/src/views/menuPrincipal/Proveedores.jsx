@@ -14,7 +14,7 @@ export default function Productos() {
     const [suppliersData, setSuppliersData] = useState([]);
     const [refresh, setRefresh] = useState(false);
     const [page, setPage] = useState(1);
-    const [limit] = useState(6);
+    const [limit, setLimit] = useState(5);
     const [total, setTotal] = useState(0);
     const [isEditModalOpen, setEditModal] = useState(false);
     const [selectedSupplier, setSelectedSupplier] = useState(null);
@@ -35,7 +35,7 @@ export default function Productos() {
                 setTotal(response.data.total);
             })
             .catch(error => console.error(error.message));
-    }, [store.id_tienda, page, refresh, searchTerm]);
+    }, [store.id_tienda, page, limit, refresh, searchTerm]);
 
     const handleEdit = (supplier) => {
         setSelectedSupplier(supplier);
@@ -97,6 +97,8 @@ export default function Productos() {
                 useSort={true}
                 ExcelModule={'suppliers'}
                 ExcelName={'Proveedores'}
+                route={'suppliers/getSuppliers'}
+                onLimitChange={(newLimit) => setLimit(newLimit)}
             />
             <Table columns={columns} data={suppliersData}/>
             <Pagination 

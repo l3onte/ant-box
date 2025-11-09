@@ -15,7 +15,9 @@ export default function TableControls({
         useFilter = false ,
         gananciasTotales,
         ExcelModule,
-        ExcelName
+        ExcelName,
+        route,
+        onLimitChange
 }) {
     const { store } = useStore();
 
@@ -37,7 +39,10 @@ export default function TableControls({
             )}
 
             <div className="flex gap-2">
-                <PaginationSelect />
+                <PaginationSelect 
+                    route={route}
+                    onChange={onLimitChange}
+                />
 
                 {useFilter && (
                     <FilterButton 

@@ -12,7 +12,7 @@ import ExpandedSaleDetails from "../../components/layout-components/table-compon
 export default function Ventas() {
     const { store } = useStore();
     const [page, setPage] = useState(1);
-    const [limit] = useState(4);
+    const [limit, setLimit] = useState(5);
     const [total, setTotal] = useState(0);
     const [sale, setSale] = useState([]);
     const [refresh, setRefresh] = useState(false);
@@ -65,7 +65,7 @@ export default function Ventas() {
                 setTotal(response?.data?.totalCount);
             })
             .catch(error => console.error(error));
-    }, [store.id_tienda, page, refresh, searchTerm, startDate, endDate])
+    }, [store.id_tienda, page, limit, refresh, searchTerm, startDate, endDate])
 
     const fetchSaleDetails = async (id_venta) => {
         try {
@@ -98,6 +98,8 @@ export default function Ventas() {
                 useFilter={true}
                 ExcelModule={'sales'}
                 ExcelName={'Ventas'}
+                route={'sales/getSales'}
+                onLimitChange={(newLimit) => setLimit(newLimit)}
             />
             <Table 
                 columns={columns} 

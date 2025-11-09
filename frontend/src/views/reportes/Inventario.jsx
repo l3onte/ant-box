@@ -11,7 +11,7 @@ export default function Inventario() {
     const { store } = useStore();
 
     const [page, setPage] = useState(1);
-    const [limit] = useState(5);
+    const [limit, setLimit] = useState(5);
     const [total, setTotal] = useState(0);
     const [inventory, setInventory] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -71,6 +71,8 @@ export default function Inventario() {
                 useSort={true}
                 ExcelModule={'inventory'}
                 ExcelName={'Inventario'}
+                route={'inventory/getInventory'}
+                onLimitChange={(newLimit) => setLimit(newLimit)}
             />
             <Table
             columns={columns}

@@ -14,7 +14,7 @@ export default function Compras() {
     const { store } = useStore();
     const [purchases, setPurchases] = useState([]);
     const [page, setPage] = useState(1);
-    const [limit] = useState(5);
+    const [limit, setLimit] = useState(5);
     const [total, setTotal] = useState(0);
     const [refresh, setRefresh] = useState(false);
     const [isEditModalOpen, setEditModal] = useState(false);
@@ -119,7 +119,7 @@ export default function Compras() {
                 setTotal(response?.data?.total);
             })
             .catch(error => console.error(error)); 
-    }, [store.id_tienda, page, refresh]);
+    }, [store.id_tienda, page, limit, refresh]);
 
     return (
         <ModuleLayout 
@@ -137,6 +137,8 @@ export default function Compras() {
                 useFilter={true}
                 ExcelModule={'purchases'}
                 ExcelName={'Compras'}
+                route={'purchases/getPurchases'}
+                onLimitChange={(newLimit) => setLimit(newLimit)}
             />
             <Table 
                 columns={columns} 

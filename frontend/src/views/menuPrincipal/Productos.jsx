@@ -13,7 +13,7 @@ export default function Productos() {
     const { store } = useStore();
 
     const [page, setPage] = useState(1);
-    const [limit] = useState(5);
+    const [limit, setLimit] = useState(5);
     const [total, setTotal] = useState(0);
     const [products, setProducts] = useState([]);
     const [search, setSearch] = useState('');
@@ -153,6 +153,8 @@ export default function Productos() {
                 useSort={true}
                 ExcelModule={'products'}
                 ExcelName={'Productos'}
+                route={'products/getProducts'}
+                onLimitChange={(newLimit) => setLimit(newLimit)}
             />
             <Table 
                 columns={columns}

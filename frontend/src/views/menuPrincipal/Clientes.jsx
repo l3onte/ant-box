@@ -17,7 +17,7 @@ export default function Clientes() {
 
     const { store } = useStore();
     const [page, setPage] = useState(1);
-    const [limit] = useState(10);
+    const [limit, setLimit] = useState(5);
     const [total, setTotal] = useState(0);
     const [customers, setCustomers] = useState([]);
     const [refresh, setRefresh] = useState(false);    
@@ -52,7 +52,7 @@ export default function Clientes() {
                 setTotal(response?.data?.total);
             })
             .catch(error => console.error(error));
-    }, [store.id_tienda, page, refresh, searchTerm]);
+    }, [store.id_tienda, page, limit, refresh, searchTerm]);
 
     const handleEdit = (customer) => {
         setSelectedCustomer(customer);
@@ -69,6 +69,8 @@ export default function Clientes() {
                 useSort={true}
                 ExcelModule={'customers'}
                 ExcelName={'Clientes'}
+                route={'/customers/getCustomers'}
+                onLimitChange={(newLimit) => setLimit(newLimit)}
             />
             <Table 
                 columns={columns}
