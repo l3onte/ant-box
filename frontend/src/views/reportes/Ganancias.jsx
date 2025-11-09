@@ -13,6 +13,8 @@ export default function Ganancias() {
     const [total, setTotal] = useState(0);
     const [data, setData] = useState([]);
     const [totalProfit, setTotalProfit] = useState({});
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
 
     const moduleInfo = {
         title: 'Ganancias',
@@ -54,13 +56,13 @@ export default function Ganancias() {
     ]
 
     useEffect(() => {
-        API.get(`/ant-box/profits/getProfits/${store.id_tienda}?page=${page}&limit=${limit}`)
+        API.get(`/ant-box/profits/getProfits/${store.id_tienda}?page=${page}&limit=${limit}&startDate=${startDate}&endDate=${endDate}`)
             .then((response) => {
                 setData(response?.data?.rows);
                 setTotal(response?.data?.total);
             })
             .catch(error => console.error('Error fetching profits data:', error));
-    }, [store.id_tienda, page, limit]);
+    }, [store.id_tienda, page, limit, startDate, endDate]);
 
     useEffect(() => {
         API.get(`/ant-box/profits/getTotal/${store.id_tienda}`)
@@ -78,6 +80,10 @@ export default function Ganancias() {
                 showProfit={true}
                 gananciasTotales={totalProfit.ganancia_total}
                 useFilter={true}
+                onDateRangeChange={(start, end) => {
+                    setStartDate(start);
+                    setEndDate(end);
+                }}
                 ExcelModule={'profits'}
                 ExcelName={'Ganancias'}
                 route={'profits/getProfits'}

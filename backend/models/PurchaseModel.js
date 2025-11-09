@@ -1,7 +1,7 @@
 import db from "../config/db.js";
 
 const PurchaseModel = {
-    getPurchases: async (id_tienda, page, limit, search = '') => {
+    getPurchases: async (id_tienda, page, limit, search = '', startDate = null, endDate = null) => {
         const offset = (page - 1) * limit;
         const searchFilter = `%${search}%`;
 
@@ -24,15 +24,26 @@ const PurchaseModel = {
                 WHERE c.id_tienda = ? 
                     AND 
                       (pv.nombre LIKE ? OR p.nombre LIKE ?)
+                    AND (
+                        (? IS NULL OR c.fecha_compra >= ?)
+                        AND
+                        (? IS NULL OR c.fecha_compra <= ?)
+                    )
                 ORDER BY c.fecha_compra DESC
                 LIMIT ? OFFSET ?;
-            `, [id_tienda, searchFilter, searchFilter, limit, offset]);
+            `, [id_tienda, searchFilter, searchFilter, startDate, startDate, endDate, endDate, limit, offset]);
 
             const [[{ total }]] = await db.query(`
-               SELECT COUNT(DISTINCT id_compra) AS total
-               FROM Compras 
-               WHERE id_tienda = ?
-            `, [id_tienda]); 
+                SELECT COUNT(DISTINCT c.id_compra) AS total
+                FROM Compras c
+                INNER JOIN Detalle_Compras dc ON c.id_compra = dc.id_compra
+                INNER JOIN Proveedores pv ON c.id_proveedor = pv.id_proveedor
+                INNER JOIN Productos p ON dc.id_producto = p.id_producto
+                WHERE c.id_tienda = ?
+                AND (pv.nombre LIKE ? OR p.nombre LIKE ?)
+                AND ((? IS NULL OR c.fecha_compra >= ?)
+                    AND (? IS NULL OR c.fecha_compra <= ?))
+            `, [id_tienda, searchFilter, searchFilter, startDate, startDate, endDate, endDate]);
 
             return { rows, total };
         } catch (error) {
