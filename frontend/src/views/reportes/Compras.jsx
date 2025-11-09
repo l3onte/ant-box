@@ -135,6 +135,8 @@ export default function Compras() {
                 useSearch={true} 
                 useSort={true} 
                 useFilter={true}
+                ExcelModule={'purchases'}
+                ExcelName={'Compras'}
             />
             <Table 
                 columns={columns} 

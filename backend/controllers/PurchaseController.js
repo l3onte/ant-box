@@ -1,4 +1,6 @@
+import PurchaseModel from '../models/PurchaseModel.js';
 import ShoppingModel from '../models/PurchaseModel.js';
+import ExcelJS from 'exceljs';
 
 const getPurchases = async (req, res) => {
     try {
@@ -44,9 +46,44 @@ const deletePurchase = async (req, res) => {
     }
 };
 
+const exportPurchases = async (req, res) => {
+    try {
+        const { id_tienda } = req.params;
+        if (!id_tienda)
+            return res.status(400).json({ message: 'El id de la tienda es requerido.' });
+
+        const { rows } = await PurchaseModel.getPurchases(id_tienda, 1, 9999, '', null, null);
+ 
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet("Compras");
+
+        worksheet.columns = [
+            { header: 'ID Columnas', key: 'id_compra', width: 10 },
+            { header: 'Fecha de Compra', key: 'fecha_compra', width: 15 },
+            { header: 'Proveedor', key: 'proveedor', width: 30 },
+            { header: 'Producto', key: 'producto', width: 30 },
+            { header: 'Cantidad', key: 'cantidad', width: 10 },
+            { header: 'Precio de Compra', key: 'precio_compra', width: 30 },
+            { header: 'Total', key: 'total', width: 30 }
+        ]
+
+        rows.forEach((compra) => worksheet.addRow(compra));
+        worksheet.getRow(1).font = { bold: true };
+
+        const buffer = await workbook.xlsx.writeBuffer();
+
+        res.setHeader("Content-Disposition", "attachment; filename=compras.xlsx");
+        res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        res.send(buffer);
+    } catch (error) {
+        res.status(500).json({ message: 'Error en exportPurchases', error: error.message });
+    }
+}
+
 export default {
     getPurchases,
     postPurchase,
     updatePurchase,
-    deletePurchase
+    deletePurchase,
+    exportPurchases
 };
