@@ -2,7 +2,6 @@ import ModuleLayout from "../../components/layout-components/ModuleLayout";
 import TableControls from "../../components/layout-components/table-components/TableControls";
 import Pagination from "../../components/layout-components/table-components/Pagination";
 import Table from "../../components/layout-components/Table";
-import { Trash2, Edit } from "lucide-react";
 import { useStore } from "../../services/storeContext";
 import { useState, useEffect } from "react";
 import API from "../../services/API.js";
@@ -12,8 +11,8 @@ export default function Ganancias() {
     const [page, setPage] = useState(1);
     const [limit] = useState(10);
     const [total, setTotal] = useState(0);
-    const [refresh, setRefresh] = useState(false);
     const [data, setData] = useState([]);
+    const [totalProfit, setTotalProfit] = useState({});
 
     const moduleInfo = {
         title: 'Ganancias',
@@ -60,13 +59,25 @@ export default function Ganancias() {
                 setData(response?.data?.rows);
                 setTotal(response?.data?.total);
             })
-    }, [store.id_tienda, page, refresh]);
+            .catch(error => console.error('Error fetching profits data:', error));
+    }, [store.id_tienda, page]);
+
+    useEffect(() => {
+        API.get(`/ant-box/profits/getTotal/${store.id_tienda}`)
+            .then((response) => {
+                setTotalProfit(response?.data);
+            })
+            .catch(error => console.error('Error fetching total profits:', error));
+    }, [store.id_tienda])
 
     return (
         <ModuleLayout 
             moduleInfo={moduleInfo}        
         >
-            <TableControls />
+            <TableControls 
+                showProfit={true}
+                gananciasTotales={totalProfit.ganancia_total}
+            />
             <Table 
                 columns={columns}
                 data={data}
