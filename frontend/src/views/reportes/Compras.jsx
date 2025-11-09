@@ -6,6 +6,9 @@ import { useEffect, useState } from "react";
 import API from "../../services/API.js";
 import { useStore } from "../../services/storeContext.jsx";
 import { Edit, Trash2 } from "lucide-react";
+import FormCompras from "../../components/forms/FormCompras.jsx";
+import Modal from "../../components/Modal.jsx";
+import Swal from "sweetalert2";
 
 export default function Compras() {
     const { store } = useStore();
@@ -13,6 +16,9 @@ export default function Compras() {
     const [page, setPage] = useState(1);
     const [limit] = useState(5);
     const [total, setTotal] = useState(0);
+    const [refresh, setRefresh] = useState(false);
+    const [isEditModalOpen, setEditModal] = useState(false);
+    const [selectedPurchase, setSelectedPurchase] = useState(null);
 
     const moduleInfo = {
         title: 'Compras',
@@ -22,8 +28,41 @@ export default function Compras() {
         buttonVariant: 'add'
     }
 
+    const handleDelete = async (id_compra) => {
+        const confirm = await Swal.fire({
+            title: "¿Estás seguro?",
+            text: "Esta acción eliminará la compra de forma permanente.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sí, eliminar",
+            cancelButtonText: "Cancelar"
+        });
+
+        if (confirm.isConfirmed) {
+            try {
+                await API.delete(`/ant-box/purchases/deletePurchase/${id_compra}`);
+                
+                Swal.fire({
+                    icon: "success",
+                    title: "Eliminado",
+                    text: "La compra se eliminó correctamente.",
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+
+                setRefresh(prev => !prev);
+            } catch (error) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Error al eliminar",
+                    text: error.response?.data?.message || "Error del servidor"
+                });
+            }
+        }
+    };
+
     const columns = [
-        { header: 'id', accessor: 'id_compra' },
+        { header: 'ID', accessor: 'id_compra' },
         { header: 'Fecha de Compra', accessor: 'fecha_compra' },
         { header: 'Proveedor', accessor: 'proveedor' },
         { header: 'Producto', accessor: 'producto' },
@@ -33,8 +72,8 @@ export default function Compras() {
             accessor: 'precio_compra',
             Cell: (row) => (
                 <div>
-                    {row.precio_compra} 
                     <span>{store.moneda === 'NIO' ? 'C$' : '$'}</span>
+                    <span>{row.precio_compra}</span> 
                 </div>
             )
         },
@@ -43,30 +82,35 @@ export default function Compras() {
             accessor: 'total',
             Cell: (row) => (
                 <div>
-                    {row.total}
                     <span>{store.moneda === 'NIO' ? 'C$' : '$'}</span>
+                    <span>{row.total}</span>
                 </div>
             ) 
         },
         {
             header: '',
             accessor: 'actions',
-            Cell: () => (
+            Cell: (row) => (
                 <div className="flex gap-2">
                     <button
                         className="p-1 text-gray-700 rounded cursor-pointer hover:text-gray-500"
+                        onClick={() => handleDelete(row.id_compra)}
                     >
                         <Trash2 size={16} />
                     </button>
                     <button
                         className="p-1 text-gray-700 rounded cursor-pointer hover:text-gray-500"
+                        onClick={() => {
+                            setSelectedPurchase(row);
+                            setEditModal(true);
+                        }}
                     >
                         <Edit size={16} />
                     </button>
                 </div>
             )
         }
-    ]
+    ];
 
     useEffect(() => {
         API.get(`/ant-box/purchases/getPurchases/${store.id_tienda}?page=${page}&limit=${limit}`)
@@ -75,21 +119,43 @@ export default function Compras() {
                 setTotal(response?.data?.total);
             })
             .catch(error => console.error(error)); 
-    }, [store.id_tienda, page])
+    }, [store.id_tienda, page, refresh]);
 
     return (
-        <ModuleLayout moduleInfo={moduleInfo}>
-            <TableControls />
-            <Table 
-                columns={columns} 
-                data={purchases} 
-            />
+        <ModuleLayout 
+            moduleInfo={moduleInfo}
+            modalContent={({ closeModal }) => (
+                <FormCompras
+                    onClose={closeModal}  
+                    onSuccess={() => setRefresh(prev => !prev)}
+                />
+            )}    
+        >
+            <TableControls useSearch={true} useSort={true} />
+            <Table columns={columns} data={purchases} />
             <Pagination 
                 page={page}
                 limit={limit}
                 total={total}
                 onPageChange={(newPage) => setPage(newPage)} 
             />
+
+            {isEditModalOpen && (
+                <Modal 
+                    onClose={() => setEditModal(false)}
+                    modalTitle={"Editar Compra"}
+                >
+                    <FormCompras
+                        onClose={() => setEditModal(false)}  
+                        onSuccess={() => {
+                            setEditModal(false);
+                            setRefresh(prev => !prev);
+                        }}
+                        purchaseData={selectedPurchase}
+                        isEditing={true}
+                    />
+                </Modal>
+            )}
         </ModuleLayout>
     )
 }

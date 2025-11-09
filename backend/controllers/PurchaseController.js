@@ -14,6 +14,39 @@ const getPurchases = async (req, res) => {
     }
 }
 
+const postPurchase = async (req, res) => {
+    try {
+        const { id_tienda } = req.params;
+        const result = await ShoppingModel.postPurchase(id_tienda, req.body);
+        res.status(201).json(result);
+    } catch (error) {
+        res.status(500).json({ message: 'Error en postPurchase', error: error.message });
+    }
+};
+
+const updatePurchase = async (req, res) => {
+    try {
+        const { id_compra } = req.params;
+        const result = await ShoppingModel.updatePurchase(id_compra, req.body);
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json({ message: 'Error en updatePurchase', error: error.message });
+    }
+};
+
+const deletePurchase = async (req, res) => {
+    try {
+        const { id_compra } = req.params;
+        const result = await ShoppingModel.deletePurchase(id_compra);
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json({ message: 'Error en deletePurchase', error: error.message });
+    }
+};
+
 export default {
-    getPurchases
-}
+    getPurchases,
+    postPurchase,
+    updatePurchase,
+    deletePurchase
+};

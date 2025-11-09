@@ -16,9 +16,9 @@ export default function TableControls({ onSearch, onSort, onDateRangeChange, use
             )}
 
             {showProfit && (
-                <div className="flex gap-2 items-center text-black">
+                <div className="flex gap-2 items-center text-black ">
                     <span className="text-sm">Ganancias Totales:</span> 
-                    <span className="text-md">
+                    <span className="text-md font-bold">
                         {store.moneda === 'NIO' ? 'C$' : '$'} {gananciasTotales}
                     </span>
                 </div>

@@ -43,7 +43,7 @@ export default function Productos() {
     }
 
     const columns = [
-        { header: 'id_proveedor', accessor: 'id_proveedor' },
+        { header: 'id', accessor: 'id_proveedor' },
         { header: 'nombre', accessor: 'nombre' },
         { header: 'direccion', accessor: 'direccion' },
         { header: 'telefono', accessor: 'telefono' },
