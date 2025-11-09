@@ -1,5 +1,6 @@
 import SellersModel from '../models/SellersModel.js'
 import bcrypt from 'bcrypt'
+import ExcelJS from 'exceljs'
 
 const postSeller = async (req, res) => {
     try {
@@ -85,9 +86,43 @@ const deleteSeller = async (req, res) => {
     }
 }
 
+const exportSellers = async (req, res) => {
+    try {
+        const { id_tienda } = req.params;
+        if (!id_tienda) 
+            res.status(400).json({ message: 'El id de la tienda es requerido.' });
+
+        const { rows } = await SellersModel.getSellers(id_tienda, 1, 9999, '');
+
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet();
+
+        worksheet.columns = [
+            { header: 'id', key: 'id', width: 20 },
+            { header: 'Vendedor', key: 'Vendedor', width: 20 },
+            { header: 'Username', key: 'Username', width: 20 },
+            { header: 'Correo', key: 'Correo', width: 40 },
+            { header: 'Rol', key: 'Rol', width: 20 }
+        ]
+
+        rows.forEach((seller) => worksheet.addRow(seller));
+        worksheet.getRow(1).font = { bold: true };
+
+        const buffer = await workbook.xlsx.writeBuffer();
+
+        res.setHeader("Content-Disposition", "attachment; filename=vendedores.xlsx");
+        res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        res.send(buffer);
+    } catch (error) {
+        console.error('Error en exportSellers: ', error.message);
+        res.status(500).json({ message: 'Error al exportar el excel: ', error: error.message });
+    }
+}
+
 export default {
     postSeller,
     getSellers,
     updateSeller,
-    deleteSeller
+    deleteSeller,
+    exportSellers
 }

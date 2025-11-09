@@ -7,5 +7,6 @@ Route.get('/getPurchases/:id_tienda', ShoppingController.getPurchases);
 Route.post('/postPurchase/:id_tienda', ShoppingController.postPurchase);
 Route.put('/updatePurchase/:id_compra', ShoppingController.updatePurchase);
 Route.delete('/deletePurchase/:id_compra', ShoppingController.deletePurchase);
+Route.get('/export/:id_tienda', ShoppingController.exportPurchases);
 
 export default Route;

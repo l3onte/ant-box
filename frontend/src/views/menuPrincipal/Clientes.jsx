@@ -65,6 +65,10 @@ export default function Clientes() {
         >
             <TableControls 
                 onSearch={(value) => setSerchTerm(value)}
+                useSearch={true}
+                useSort={true}
+                ExcelModule={'customers'}
+                ExcelName={'Clientes'}
             />
             <Table 
                 columns={columns}

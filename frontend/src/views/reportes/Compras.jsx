@@ -131,8 +131,17 @@ export default function Compras() {
                 />
             )}    
         >
-            <TableControls useSearch={true} useSort={true} />
-            <Table columns={columns} data={purchases} />
+            <TableControls 
+                useSearch={true} 
+                useSort={true} 
+                useFilter={true}
+                ExcelModule={'purchases'}
+                ExcelName={'Compras'}
+            />
+            <Table 
+                columns={columns} 
+                data={purchases} 
+            />
             <Pagination 
                 page={page}
                 limit={limit}

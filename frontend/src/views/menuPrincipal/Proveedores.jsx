@@ -93,6 +93,10 @@ export default function Productos() {
         >
             <TableControls 
                 onSearch={(value) => setSearchTerm(value)}
+                useSearch={true}
+                useSort={true}
+                ExcelModule={'suppliers'}
+                ExcelName={'Proveedores'}
             />
             <Table columns={columns} data={suppliersData}/>
             <Pagination 
