@@ -1,4 +1,5 @@
 import ProductsModel from '../models/ProductsModel.js';
+import ExcelJS from 'exceljs';
 
 const getProducts = async (req, res) => {
     try {
@@ -60,9 +61,43 @@ const deleteProduct = async (req, res) => {
     }
 };
 
+const exportProduct = async (req, res) => {
+    try {
+        const { id_tienda } = req.params;
+        if (!id_tienda)
+            return res.status(400).json({ message: "El id de la tienda es requerido." });
+
+        const { rows } = await ProductsModel.getProducts(id_tienda, 1, 9999, '');
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet();
+
+        worksheet.columns = [
+            { header: 'id', key: 'id_producto', width: 10 },
+            { header: 'proveedor', key: 'proveedor', width: 30 },
+            { header: 'producto', key: 'nombre', width: 30 },
+            { header: 'descripcion', key: 'descripcion', width: 50 },
+            { header: 'precio de compra', key: 'precio_compra', width: 30 },
+            { header: '%. ganancia', key: 'porcentaje_ganancia', width: 30 },
+            { header: 'precio venta', key: 'precio_venta', width: 30 }
+        ]
+
+        rows.forEach((product) => worksheet.addRow(product));
+        worksheet.getRow(1).font = { bold: true };
+
+        const buffer = await workbook.xlsx.writeBuffer();
+        res.setHeader("Content-Disposition", "attachment; filename=productos.xlsx");
+        res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        res.send(buffer);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+        console.error(error);
+    }
+}
+
 export default {
     getProducts,
     postProduct,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    exportProduct
 }

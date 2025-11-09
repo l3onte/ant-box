@@ -151,6 +151,8 @@ export default function Productos() {
             <TableControls 
                 useSearch={true}
                 useSort={true}
+                ExcelModule={'products'}
+                ExcelName={'Productos'}
             />
             <Table 
                 columns={columns}
