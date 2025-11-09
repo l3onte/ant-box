@@ -121,8 +121,13 @@ export default function Vendedores() {
         >
             <TableControls 
                 onSearch={(value) => setSearchTerm(value)}
+                useSearch={true}
+                useSort={true}
             />
-            <Table columns={columns} data={sellersData} />
+            <Table 
+                columns={columns} 
+                data={sellersData} 
+            />
             <Pagination 
                 page={page}
                 limit={limit}

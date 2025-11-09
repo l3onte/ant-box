@@ -2,9 +2,10 @@ import Search from "./Search"
 import FilterButton from "./FilterButton"
 import SortButton from "./SortButton"
 import PaginationSelect from "./PaginationSelect"
+import ExcelButton from "./ExcelButton"
 import { useStore } from "../../../services/storeContext";
 
-export default function TableControls({ onSearch, onSort, onDateRangeChange, useSearch = false, useSort = false, showProfit = false, gananciasTotales }) {
+export default function TableControls({ onSearch, onSort, onDateRangeChange, useSearch = false, useSort = false, showProfit = false, useFilter = false ,gananciasTotales }) {
     const { store } = useStore();
 
     return (
@@ -26,13 +27,18 @@ export default function TableControls({ onSearch, onSort, onDateRangeChange, use
 
             <div className="flex gap-2">
                 <PaginationSelect />
-                <FilterButton 
-                    onDateRangeChange={onDateRangeChange}
-                />
+
+                {useFilter && (
+                    <FilterButton 
+                        onDateRangeChange={onDateRangeChange}
+                    />
+                )}
 
                 {useSort && (
                     <SortButton onSort={onSort}/>
                 )}
+
+                <ExcelButton />
             </div>
         </div>
     )

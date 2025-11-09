@@ -12,7 +12,7 @@ import ExpandedSaleDetails from "../../components/layout-components/table-compon
 export default function Ventas() {
     const { store } = useStore();
     const [page, setPage] = useState(1);
-    const [limit] = useState(3);
+    const [limit] = useState(4);
     const [total, setTotal] = useState(0);
     const [sale, setSale] = useState([]);
     const [refresh, setRefresh] = useState(false);
@@ -93,6 +93,9 @@ export default function Ventas() {
                     setStartDate(start);
                     setEndDate(end);
                 }}
+                useSearch={true}
+                useSort={true}
+                useFilter={true}
             />
             <Table 
                 columns={columns} 

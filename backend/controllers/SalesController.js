@@ -1,4 +1,5 @@
 import SalesModel from "../models/SalesModel.js";
+import ExcelJS from "exceljs";
 
 const postSale = async (req ,res) => {
     try {
@@ -121,6 +122,39 @@ const getProducts = async (req, res) => {
     }
 }
 
+const exportSales = async (req, res) => {
+    try {
+        const { id_tienda } = req.params;
+        if (!id_tienda)
+            return res.status(400).json({ message: "El id de la tienda es requerido." });
+
+        const { rows } = await SalesModel.getSale(id_tienda, 1, 99999, '', null, null);
+
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet("Ventas");
+
+        worksheet.columns = [
+            { header: "ID Venta", key: "id_venta", width: 10 },
+            { header: "Fecha", key: "Fecha", width: 15 },
+            { header: "Cliente", key: "Cliente", width: 25 },
+            { header: "Cantidad de Productos", key: "Cantidad_de_Productos", width: 25 },
+            { header: "Total Venta", key: "Total_Venta", width: 15 },
+        ]
+
+        rows.forEach((venta) => worksheet.addRow(venta));
+        worksheet.getRow(1).font = { bold: true };
+
+        const buffer = await workbook.xlsx.writeBuffer();
+
+        res.setHeader("Content-Disposition", "attachment; filename=ventas.xlsx");
+        res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        res.send(buffer);
+    } catch (error) {
+        console.error("Error al exportar ventas: ", error.message);
+        res.status(500).json({ message: "Error al generar el Excel." });
+    }
+}
+
 export default {
     getSales,
     getSaleDetails,
@@ -128,5 +162,6 @@ export default {
     updateSale,
     deleteSale,
     deleteDetail,
-    getProducts
+    getProducts,
+    exportSales
 }

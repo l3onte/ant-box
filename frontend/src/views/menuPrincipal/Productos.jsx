@@ -148,7 +148,10 @@ export default function Productos() {
                 />
             )}
         >
-            <TableControls />
+            <TableControls 
+                useSearch={true}
+                useSort={true}
+            />
             <Table 
                 columns={columns}
                 data={products}

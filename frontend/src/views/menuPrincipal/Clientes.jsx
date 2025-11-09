@@ -65,6 +65,8 @@ export default function Clientes() {
         >
             <TableControls 
                 onSearch={(value) => setSerchTerm(value)}
+                useSearch={true}
+                useSort={true}
             />
             <Table 
                 columns={columns}

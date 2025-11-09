@@ -67,6 +67,8 @@ export default function Inventario() {
         >
             <TableControls 
                 onSearch={(value) => setSearchTerm(value)}
+                useSearch={true}
+                useSort={true}
             />
             <Table
             columns={columns}
@@ -82,7 +84,12 @@ export default function Inventario() {
                 </div>
             )}
             />
-            <Pagination page={page} limit={limit} total={total}/>
+            <Pagination 
+                page={page} 
+                limit={limit} 
+                total={total}
+                onPageChange={(newPage) => setPage(newPage)}
+            />
         </ModuleLayout>
     )
 }

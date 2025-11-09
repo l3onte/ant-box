@@ -93,6 +93,8 @@ export default function Productos() {
         >
             <TableControls 
                 onSearch={(value) => setSearchTerm(value)}
+                useSearch={true}
+                useSort={true}
             />
             <Table columns={columns} data={suppliersData}/>
             <Pagination 

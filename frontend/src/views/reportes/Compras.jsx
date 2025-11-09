@@ -131,8 +131,15 @@ export default function Compras() {
                 />
             )}    
         >
-            <TableControls useSearch={true} useSort={true} />
-            <Table columns={columns} data={purchases} />
+            <TableControls 
+                useSearch={true} 
+                useSort={true} 
+                useFilter={true}
+            />
+            <Table 
+                columns={columns} 
+                data={purchases} 
+            />
             <Pagination 
                 page={page}
                 limit={limit}

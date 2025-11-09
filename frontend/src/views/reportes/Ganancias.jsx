@@ -77,6 +77,7 @@ export default function Ganancias() {
             <TableControls 
                 showProfit={true}
                 gananciasTotales={totalProfit.ganancia_total}
+                useFilter={true}
             />
             <Table 
                 columns={columns}
