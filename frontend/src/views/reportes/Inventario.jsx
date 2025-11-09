@@ -69,6 +69,8 @@ export default function Inventario() {
                 onSearch={(value) => setSearchTerm(value)}
                 useSearch={true}
                 useSort={true}
+                ExcelModule={'inventory'}
+                ExcelName={'Inventario'}
             />
             <Table
             columns={columns}
