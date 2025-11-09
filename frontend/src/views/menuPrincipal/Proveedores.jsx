@@ -95,6 +95,8 @@ export default function Productos() {
                 onSearch={(value) => setSearchTerm(value)}
                 useSearch={true}
                 useSort={true}
+                ExcelModule={'suppliers'}
+                ExcelName={'Proveedores'}
             />
             <Table columns={columns} data={suppliersData}/>
             <Pagination 

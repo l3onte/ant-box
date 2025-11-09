@@ -1,4 +1,5 @@
 import SuppliersModel from "../models/SuppliersModel.js";
+import ExcelJS from "exceljs"
 
 const postSupplier = async (req, res) => {
     try {
@@ -69,9 +70,41 @@ const deleteSupplier = async (req, res) => {
     }
 };
 
+const exportSuppliers = async (req, res) => {
+    try {
+        const { id_tienda } = req.params;
+        if (!id_tienda)
+            res.status(400).json({ message: 'El id de la tienda es requerido.' });
+
+        const { result } = await SuppliersModel.getSuppliers(id_tienda, 1, 9999, '');
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet("Proveedores");
+
+        worksheet.columns = [
+            { header: 'id', key: 'id_proveedor', width: 30 },
+            { header: 'nombre', key: 'nombre', width: 30 },
+            { header: 'direccion', key: 'direccion', width: 50 },
+            { header: 'telefono', key: 'telefono', width: 30 },
+            { header: 'email', key: 'email', width: 30 }
+        ]
+
+        result.forEach((supplier) => worksheet.addRow(supplier));
+        worksheet.getRow(1).font = { bold: true };
+
+        const buffer = await workbook.xlsx.writeBuffer();
+
+        res.setHeader("Content-Disposition", "attachment; filename=proveedores.xlsx");
+        res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        res.send(buffer);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
 export default {
     postSupplier,
     getSuppliers,
     updateSupplier,
-    deleteSupplier
+    deleteSupplier,
+    exportSuppliers
 }
