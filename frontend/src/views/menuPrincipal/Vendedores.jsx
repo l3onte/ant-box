@@ -123,6 +123,8 @@ export default function Vendedores() {
                 onSearch={(value) => setSearchTerm(value)}
                 useSearch={true}
                 useSort={true}
+                ExcelModule={'sellers'}
+                ExcelName={'Vendedores'}
             />
             <Table 
                 columns={columns} 
