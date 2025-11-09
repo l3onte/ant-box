@@ -12,6 +12,7 @@ import saleRoutes from './routes/salesRoutes.js';
 import customerRoutes from './routes/customersRoutes.js';
 import productsRoutes from './routes/productsRoutes.js';
 import purchaseRoutes from './routes/PurchasesRoutes.js';
+import profitsRoutes from './routes/profitsRoutes.js';
 
 dotenv.config();
 const PORT = process.env.PORT || 3000;
@@ -48,6 +49,7 @@ app.use('/ant-box/sales', saleRoutes);
 app.use('/ant-box/customers', customerRoutes);
 app.use('/ant-box/products', productsRoutes);
 app.use('/ant-box/purchases', purchaseRoutes);
+app.use('/ant-box/profits', profitsRoutes);
 
 app.listen(PORT, () => {
     console.log(`Server is running on: ${PORT}`);
