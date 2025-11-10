@@ -1,9 +1,10 @@
 import db from '../config/db.js';
 
 const CustomerModel = {
-    getCustomers: async (id_tienda, page, limit, search = '') => {
+    getCustomers: async (id_tienda, page, limit, search = '', sort = 'ASC') => {
         const offset = (page - 1) * limit;
         const searchFilter = `%${search}%`
+        const order = sort.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
 
         try {
             const [rows] = await db.query(`
@@ -22,6 +23,7 @@ const CustomerModel = {
                         OR telefono LIKE ?
                         OR email LIKE ?
                     )
+                ORDER BY nombre ${order}
                 LIMIT ? OFFSET ?;
             `, [id_tienda, searchFilter, searchFilter, searchFilter, searchFilter, searchFilter, limit, offset]);
 

@@ -19,9 +19,10 @@ const Suppliers = {
         }
     },
 
-    getSuppliers: async (id_tienda, page = 1, limit = 5, search = '') => {
+    getSuppliers: async (id_tienda, page = 1, limit = 5, search = '', sort = 'ASC') => {
         const offset = (page - 1) * limit;
         const searchFilter = `%${search}%`;
+        const order = sort.toUpperCase() === 'DESC' ? 'DESC' : 'ASC'; 
 
         try {
             const [result] = await db.query(`
@@ -42,6 +43,7 @@ const Suppliers = {
                         OR email LIKE ?
                         OR status LIKE ?
                     )
+                ORDER BY nombre ${order}
                 LIMIT ? OFFSET ?;
             `, [id_tienda, searchFilter, searchFilter, searchFilter, searchFilter, searchFilter, searchFilter,limit, offset]);
 

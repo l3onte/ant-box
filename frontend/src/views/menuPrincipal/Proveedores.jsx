@@ -14,11 +14,12 @@ export default function Productos() {
     const [suppliersData, setSuppliersData] = useState([]);
     const [refresh, setRefresh] = useState(false);
     const [page, setPage] = useState(1);
-    const [limit] = useState(6);
+    const [limit, setLimit] = useState(5);
     const [total, setTotal] = useState(0);
     const [isEditModalOpen, setEditModal] = useState(false);
     const [selectedSupplier, setSelectedSupplier] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
+    const [sortOrder, setSortOrder] = useState('ASC');
 
     const moduleInfo = {
         title: 'Proveedores',
@@ -29,13 +30,13 @@ export default function Productos() {
     }
 
     useEffect(() => {
-        API.get(`/ant-box/suppliers/getSuppliers/${store.id_tienda}?page=${page}&limit=${limit}&search=${searchTerm}`)
+        API.get(`/ant-box/suppliers/getSuppliers/${store.id_tienda}?page=${page}&limit=${limit}&search=${searchTerm}&sort=${sortOrder}`)
             .then((response) => {
                 setSuppliersData(response.data.result);
                 setTotal(response.data.total);
             })
             .catch(error => console.error(error.message));
-    }, [store.id_tienda, page, refresh, searchTerm]);
+    }, [store.id_tienda, page, limit, refresh, searchTerm, sortOrder]);
 
     const handleEdit = (supplier) => {
         setSelectedSupplier(supplier);
@@ -93,10 +94,13 @@ export default function Productos() {
         >
             <TableControls 
                 onSearch={(value) => setSearchTerm(value)}
+                onSort={(order) => setSortOrder(order)}
                 useSearch={true}
                 useSort={true}
                 ExcelModule={'suppliers'}
                 ExcelName={'Proveedores'}
+                route={'suppliers/getSuppliers'}
+                onLimitChange={(newLimit) => setLimit(newLimit)}
             />
             <Table columns={columns} data={suppliersData}/>
             <Pagination 

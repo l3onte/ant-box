@@ -1,5 +1,6 @@
 import SalesModel from "../models/SalesModel.js";
 import ExcelJS from "exceljs";
+import db from "../config/db.js";
 
 const postSale = async (req ,res) => {
     try {
@@ -23,7 +24,7 @@ const postSale = async (req ,res) => {
 const getSales = async (req, res) => {
     try {   
         const { id_tienda } = req.params;
-        let { page = 1, limit = 5, search = '', startDate, endDate } = req.query;
+        let { page = 1, limit = 5, search = '', startDate, endDate, sort = 'ASC' } = req.query;
 
         startDate = startDate && startDate.trim() !== '' ? startDate : null;
         endDate = endDate && endDate.trim() !== '' ? endDate : null;
@@ -37,7 +38,8 @@ const getSales = async (req, res) => {
                                                 Number(limit), 
                                                 search, 
                                                 startDate, 
-                                                endDate
+                                                endDate,
+                                                sort
                                             );
         return res.status(200).json(result);
     } catch (error) {
@@ -155,6 +157,47 @@ const exportSales = async (req, res) => {
     }
 }
 
+const getSaleReceipt = async (req, res) => {
+    try {
+        const { id_venta } = req.params;
+        if (!id_venta)
+            return res.status(400).json({ message: "El id de la venta es requerido." });
+
+        const [[venta]] = await db.query(`
+            SELECT 
+                v.id_venta,
+                DATE_FORMAT(v.fecha_venta, '%d/%m/%Y') AS fecha_venta,
+                c.nombre AS cliente,
+                c.telefono,
+                c.email,
+                v.total
+            FROM Ventas v
+            INNER JOIN Clientes c ON c.id_cliente = v.id_cliente
+            WHERE v.id_venta = ?;
+        `, [id_venta]);
+
+        if (!venta)
+            return res.status(404).json({ message: "Venta no encontrada." });
+
+        const [detalles] = await db.query(`
+            SELECT 
+                p.nombre AS producto,
+                dv.cantidad,
+                p.precio_unitario,
+                (dv.cantidad * p.precio_unitario) AS subtotal
+            FROM Detalle_Ventas dv
+            INNER JOIN Productos p ON p.id_producto = dv.id_producto
+            WHERE dv.id_venta = ?;
+        `, [id_venta]);
+
+        return res.status(200).json({ venta, detalles });
+
+    } catch (error) {
+        console.error("Error en getSaleReceipt: ", error.message);
+        res.status(500).json({ message: "Error al generar el recibo.", error: error.message })
+    }
+}
+
 export default {
     getSales,
     getSaleDetails,
@@ -163,5 +206,6 @@ export default {
     deleteSale,
     deleteDetail,
     getProducts,
-    exportSales
+    exportSales,
+    getSaleReceipt
 }

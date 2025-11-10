@@ -1,9 +1,10 @@
 import db from "../config/db.js";
 
 const PurchaseModel = {
-    getPurchases: async (id_tienda, page, limit, search = '') => {
+    getPurchases: async (id_tienda, page, limit, search = '', startDate = null, endDate = null, sort = 'ASC') => {
         const offset = (page - 1) * limit;
         const searchFilter = `%${search}%`;
+        const order = sort.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
 
         try {
             const [rows] = await db.query(`
@@ -24,15 +25,26 @@ const PurchaseModel = {
                 WHERE c.id_tienda = ? 
                     AND 
                       (pv.nombre LIKE ? OR p.nombre LIKE ?)
-                ORDER BY c.fecha_compra DESC
+                    AND (
+                        (? IS NULL OR c.fecha_compra >= ?)
+                        AND
+                        (? IS NULL OR c.fecha_compra <= ?)
+                    )
+                ORDER BY pv.nombre ${order}
                 LIMIT ? OFFSET ?;
-            `, [id_tienda, searchFilter, searchFilter, limit, offset]);
+            `, [id_tienda, searchFilter, searchFilter, startDate, startDate, endDate, endDate, limit, offset]);
 
             const [[{ total }]] = await db.query(`
-               SELECT COUNT(DISTINCT id_compra) AS total
-               FROM Compras 
-               WHERE id_tienda = ?
-            `, [id_tienda]); 
+                SELECT COUNT(DISTINCT c.id_compra) AS total
+                FROM Compras c
+                INNER JOIN Detalle_Compras dc ON c.id_compra = dc.id_compra
+                INNER JOIN Proveedores pv ON c.id_proveedor = pv.id_proveedor
+                INNER JOIN Productos p ON dc.id_producto = p.id_producto
+                WHERE c.id_tienda = ?
+                AND (pv.nombre LIKE ? OR p.nombre LIKE ?)
+                AND ((? IS NULL OR c.fecha_compra >= ?)
+                    AND (? IS NULL OR c.fecha_compra <= ?))
+            `, [id_tienda, searchFilter, searchFilter, startDate, startDate, endDate, endDate]);
 
             return { rows, total };
         } catch (error) {
@@ -41,7 +53,6 @@ const PurchaseModel = {
         }
     },
 
-    // ✅ POST - Registrar compra
     postPurchase: async (id_tienda, data) => {
         const conn = await db.getConnection();
         try {
@@ -52,12 +63,11 @@ const PurchaseModel = {
                 id_producto,
                 cantidad,
                 precio_compra,
-                nuevo_producto // opcional: datos del nuevo producto
+                nuevo_producto 
             } = data;
 
             let productoId = id_producto;
 
-            // 1️⃣ Si se agrega un nuevo producto
             if (!id_producto && nuevo_producto) {
                 const [resultProducto] = await conn.query(`
                     INSERT INTO Productos (
@@ -78,10 +88,8 @@ const PurchaseModel = {
                 productoId = resultProducto.insertId;
             }
 
-            // 2️⃣ Calcular total de la compra
             const totalCompra = cantidad * precio_compra;
 
-            // 3️⃣ Insertar la compra
             const [resultCompra] = await conn.query(`
                 INSERT INTO Compras (id_proveedor, fecha_compra, total, id_tienda)
                 VALUES (?, CURDATE(), ?, ?)
@@ -89,13 +97,11 @@ const PurchaseModel = {
 
             const id_compra = resultCompra.insertId;
 
-            // 4️⃣ Insertar detalle de la compra
             await conn.query(`
                 INSERT INTO Detalle_Compras (id_compra, id_producto, cantidad, precio_compra)
                 VALUES (?, ?, ?, ?)
             `, [id_compra, productoId, cantidad, precio_compra]);
 
-            // 5️⃣ Actualizar el stock del producto
             await conn.query(`
                 UPDATE Productos 
                 SET stock = stock + ?,
@@ -104,7 +110,7 @@ const PurchaseModel = {
             `, [cantidad, precio_compra, productoId]);
 
             await conn.commit();
-            return { message: 'Compra registrada correctamente' };
+            return { message: 'Compra registrada correctamente', id_compra };
         } catch (error) {
             await conn.rollback();
             console.error('Error en postPurchase:', error.message);
@@ -114,7 +120,6 @@ const PurchaseModel = {
         }
     },
 
-    // ✅ PUT - Actualizar compra existente (permite cambiar proveedor y producto)
     updatePurchase: async (id_compra, data) => {
         const conn = await db.getConnection();
         try {
@@ -122,7 +127,6 @@ const PurchaseModel = {
 
             const { cantidad, precio_compra, id_producto, id_proveedor } = data;
 
-            // Obtener el detalle actual
             const [[detalleActual]] = await conn.query(`
                 SELECT id_producto, cantidad 
                 FROM Detalle_Compras 
@@ -136,14 +140,12 @@ const PurchaseModel = {
             const productoAnterior = detalleActual.id_producto;
             const cantidadAnterior = detalleActual.cantidad;
 
-            // 🔹 1. Ajustar stock del producto anterior (restar lo que se había sumado)
             await conn.query(`
                 UPDATE Productos 
                 SET stock = stock - ?
                 WHERE id_producto = ?
             `, [cantidadAnterior, productoAnterior]);
 
-            // 🔹 2. Si cambió el producto, sumar al nuevo producto
             if (productoAnterior !== id_producto) {
                 await conn.query(`
                     UPDATE Productos 
@@ -152,7 +154,6 @@ const PurchaseModel = {
                     WHERE id_producto = ?
                 `, [cantidad, precio_compra, id_producto]);
             } else {
-                // Si es el mismo producto, solo ajustar la diferencia
                 const diferencia = cantidad - cantidadAnterior;
                 await conn.query(`
                     UPDATE Productos 
@@ -162,14 +163,12 @@ const PurchaseModel = {
                 `, [diferencia, precio_compra, id_producto]);
             }
 
-            // 🔹 3. Actualizar el detalle de compra
             await conn.query(`
                 UPDATE Detalle_Compras
                 SET id_producto = ?, cantidad = ?, precio_compra = ?
                 WHERE id_compra = ?
             `, [id_producto, cantidad, precio_compra, id_compra]);
 
-            // 🔹 4. Actualizar proveedor y total en la tabla Compras
             const nuevoTotal = cantidad * precio_compra;
             await conn.query(`
                 UPDATE Compras
@@ -178,7 +177,7 @@ const PurchaseModel = {
             `, [id_proveedor, nuevoTotal, id_compra]);
 
             await conn.commit();
-            return { message: 'Compra actualizada correctamente' };
+            return { message: 'Compra actualizada correctamente', id_compra };
         } catch (error) {
             await conn.rollback();
             console.error('Error en updatePurchase:', error.message);
@@ -189,18 +188,15 @@ const PurchaseModel = {
     },
 
 
-    // ✅ DELETE - Eliminar compra
     deletePurchase: async (id_compra) => {
         const conn = await db.getConnection();
         try {
             await conn.beginTransaction();
 
-            // Obtener detalle antes de eliminar
             const [detalle] = await conn.query(`
                 SELECT id_producto, cantidad FROM Detalle_Compras WHERE id_compra = ?
             `, [id_compra]);
 
-            // Restar stock de productos
             for (const item of detalle) {
                 await conn.query(`
                     UPDATE Productos 
@@ -209,7 +205,6 @@ const PurchaseModel = {
                 `, [item.cantidad, item.id_producto]);
             }
 
-            // Eliminar compra (cascade borra detalle)
             await conn.query(`
                 DELETE FROM Compras WHERE id_compra = ?
             `, [id_compra]);

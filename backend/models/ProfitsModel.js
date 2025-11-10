@@ -1,9 +1,8 @@
 import db from "../config/db.js";
 
 const ProfitsModel = {
-    getProfits: async (id_tienda, page = 1, limit = 10, search = '', startDate, endDate) => {
+    getProfits: async (id_tienda, page = 1, limit = 10, startDate, endDate) => {
         const offset = (page - 1) * limit;
-        const searchFilter = `%${search}%`;
 
         try {
             const [rows] = await db.query(`
@@ -16,18 +15,25 @@ const ProfitsModel = {
                 INNER JOIN Detalle_Ventas dv ON v.id_venta = dv.id_venta
                 INNER JOIN Productos p ON dv.id_producto = p.id_producto
                 WHERE v.id_tienda = ?
+                    AND (
+                        (? IS NULL OR v.fecha_venta >= ?)
+                        AND
+                        (? IS NULL OR v.fecha_venta <= ?)
+                    )
                 GROUP BY v.fecha_venta
                 ORDER BY v.fecha_venta DESC
                 LIMIT ? OFFSET ?;
-            `, [id_tienda, limit, offset, startDate, endDate]);
+            `, [id_tienda, startDate, startDate, endDate, endDate, limit, offset]);
 
             const [[{ total} ]] = await db.query(`
                 SELECT COUNT(DISTINCT v.fecha_venta) AS total
                 FROM Ventas v
                 INNER JOIN Detalle_Ventas dv ON v.id_venta = dv.id_venta
                 INNER JOIN Productos p ON dv.id_producto = p.id_producto
-                WHERE v.id_tienda = ?;
-            `, [id_tienda]);
+                WHERE v.id_tienda = ?
+                    AND ((? IS NULL OR v.fecha_venta >= ?)
+                    AND  (? IS NULL OR v.fecha_venta <= ?));
+            `, [id_tienda, startDate, startDate, endDate, endDate]);
 
 
             return { rows, total };

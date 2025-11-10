@@ -20,13 +20,14 @@ export default function Vendedores() {
     }
 
     const [page, setPage] = useState(1);
-    const [limit] = useState(10);
+    const [limit, setLimit] = useState(5);
     const [total, setTotal] = useState(0);
     const [sellersData, setSellersData] = useState([]);
     const [refresh, setRefresh] = useState(false);
     const [isEditModalOpen, setEditModal] = useState(false);
     const [selectedSeller, setSelectedSeller] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
+    const [sortOrder, setSortOrder] = useState('ASC');
 
     const handleDelete = async (id) => {
         const result = await Swal.fire({
@@ -101,13 +102,13 @@ export default function Vendedores() {
     const { store } = useStore();
 
     useEffect(() => {
-        API.get(`/ant-box/sellers/getSellers/${store.id_tienda}?page=${page}&limit=${limit}&search=${searchTerm}`)
+        API.get(`/ant-box/sellers/getSellers/${store.id_tienda}?page=${page}&limit=${limit}&search=${searchTerm}&sort=${sortOrder}`)
             .then((response) => {
                 setSellersData(response.data.rows);
                 setTotal(response.data.total);
             })
             .catch(error => console.error(error));
-    }, [store.id_tienda, page, refresh, searchTerm])
+    }, [store.id_tienda, page, limit, refresh, searchTerm, sortOrder])
 
     return (
         <ModuleLayout 
@@ -121,10 +122,13 @@ export default function Vendedores() {
         >
             <TableControls 
                 onSearch={(value) => setSearchTerm(value)}
+                onSort={(order) => setSortOrder(order)}
                 useSearch={true}
                 useSort={true}
                 ExcelModule={'sellers'}
                 ExcelName={'Vendedores'}
+                route={'sellers/getSellers'}
+                onLimitChange={(newLimit) => setLimit(newLimit)}
             />
             <Table 
                 columns={columns} 

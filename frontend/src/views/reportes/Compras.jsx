@@ -14,11 +14,15 @@ export default function Compras() {
     const { store } = useStore();
     const [purchases, setPurchases] = useState([]);
     const [page, setPage] = useState(1);
-    const [limit] = useState(5);
+    const [limit, setLimit] = useState(5);
     const [total, setTotal] = useState(0);
     const [refresh, setRefresh] = useState(false);
     const [isEditModalOpen, setEditModal] = useState(false);
     const [selectedPurchase, setSelectedPurchase] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
+    const [sortOrder, setSortOrder] = useState('ASC');
 
     const moduleInfo = {
         title: 'Compras',
@@ -113,13 +117,13 @@ export default function Compras() {
     ];
 
     useEffect(() => {
-        API.get(`/ant-box/purchases/getPurchases/${store.id_tienda}?page=${page}&limit=${limit}`)
+        API.get(`/ant-box/purchases/getPurchases/${store.id_tienda}?page=${page}&limit=${limit}&search=${searchTerm}&startDate=${startDate}&endDate=${endDate}&sort=${sortOrder}`)
             .then((response) => {
                 setPurchases(response?.data?.rows);
                 setTotal(response?.data?.total);
             })
             .catch(error => console.error(error)); 
-    }, [store.id_tienda, page, refresh]);
+    }, [store.id_tienda, page, limit, searchTerm, startDate, endDate, refresh, sortOrder]);
 
     return (
         <ModuleLayout 
@@ -133,10 +137,18 @@ export default function Compras() {
         >
             <TableControls 
                 useSearch={true} 
+                onSearch={(value) => setSearchTerm(value)}
+                onSort={(order) => setSortOrder(order)}
                 useSort={true} 
                 useFilter={true}
+                onDateRangeChange={(start, end) => {
+                    setStartDate(start ? new Date(start).toISOString().slice(0, 10) : '');
+                    setEndDate(end ? new Date(end).toISOString().slice(0, 10) : '');
+                }}
                 ExcelModule={'purchases'}
                 ExcelName={'Compras'}
+                route={'purchases/getPurchases'}
+                onLimitChange={(newLimit) => setLimit(newLimit)}
             />
             <Table 
                 columns={columns} 

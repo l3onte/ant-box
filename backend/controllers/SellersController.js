@@ -31,12 +31,12 @@ const postSeller = async (req, res) => {
 const getSellers = async (req, res) => {
     try {
         const { id } = req.params;
-        const { page = 1, limit = 5, search = '' } = req.query;
+        const { page = 1, limit = 5, search = '', sort = 'ASC' } = req.query;
 
         if (!id) 
             return res.status(400).json({ message: 'El id de la tienda es requerido.' });
 
-        const result = await SellersModel.getSellers(id, Number(page), Number(limit), search);
+        const result = await SellersModel.getSellers(id, Number(page), Number(limit), search, sort);
         
         if (result.rows.length === 0) 
             return res.status(404).json({ message: 'No se encontraron a los usuarios de esta tienda.' });

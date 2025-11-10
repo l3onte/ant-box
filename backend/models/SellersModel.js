@@ -37,9 +37,10 @@ const Sellers = {
         }
     },
 
-    getSellers: async (id, page = 1, limit = 5, search = '') => {
+    getSellers: async (id, page = 1, limit = 5, search = '', sort = 'ASC') => {
         const offset = (page - 1) * limit;
         const searchFilter = `%${search}%`;
+        const order = sort.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
 
         try {
             const [rows] = await db.query(`
@@ -59,7 +60,7 @@ const Sellers = {
                         OR Usuarios.correo LIKE ?
                         OR Usuarios.rol LIKE ?
                     )
-                ORDER BY Vendedor ASC
+                ORDER BY Vendedor ${order}
                 LIMIT ? OFFSET ?;
             `, [id, searchFilter, searchFilter, searchFilter, searchFilter, searchFilter, limit, offset]);
 

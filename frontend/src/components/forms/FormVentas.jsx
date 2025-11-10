@@ -74,13 +74,70 @@ export default function FormVentas() {
                 productos: saleProducts
             };
 
-            await API.post(`/ant-box/sales/postSale/${store.id_tienda}`, { saleInfo });
+            const result = await API.post(`/ant-box/sales/postSale/${store.id_tienda}`, { saleInfo });
 
             Swal.fire("Éxito", "Venta registrada correctamente.", "success");
+
+            const receipt = await API.get(`/ant-box/sales/receipt/${result.data.ventaId}`);
+            openReceiptWindow(receipt.data);
         } catch (error) {
             console.error(error);
             Swal.fire("Error", "No se pudo registrar la venta.", "error");
         }
+    };
+
+    const openReceiptWindow = (data) => {
+        const { venta, detalles } = data;
+
+        const html = `
+          <html>
+            <head>
+              <title>Recibo de Venta #${venta.id_venta}</title>
+              <style>
+                body { font-family: Arial, sans-serif; margin: 20px; }
+                h2 { text-align: center; }
+                table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+                th { background-color: #f3f3f3; }
+                .total { text-align: right; font-weight: bold; margin-top: 20px; }
+              </style>
+            </head>
+            <body>
+              <h2>Recibo de Venta</h2>
+              <p><strong>ID Venta:</strong> ${venta.id_venta}</p>
+              <p><strong>Cliente:</strong> ${venta.cliente}</p>
+              <p><strong>Fecha:</strong> ${venta.fecha_venta}</p>
+
+              <table>
+                <thead>
+                  <tr>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Precio Unitario</th>
+                    <th>Subtotal</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${detalles.map(d => `
+                    <tr>
+                      <td>${d.producto}</td>
+                      <td>${d.cantidad}</td>
+                      <td>${d.precio_unitario}</td>
+                      <td>${d.subtotal}</td>
+                    </tr>
+                  `).join("")}
+                </tbody>
+              </table>
+
+              <p class="total">Total: ${venta.total}</p>
+              <script>window.print();</script>
+            </body>
+          </html>
+        `;
+
+        const win = window.open("", "_blank");
+        win.document.write(html);
+        win.document.close();
     };
 
     return (

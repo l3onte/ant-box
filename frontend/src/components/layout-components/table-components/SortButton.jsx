@@ -15,7 +15,7 @@ export default function SortButton({ onSort }) {
             onClick={toggleSort}
             className="flex items-center gap-1 text-black border border-gray-300 bg-gray-50 px-4 rounded shadow-sm cursor-pointer hover:bg-white"
         >
-            <ArrowDownAZ className='w-4'/>
+            {sortOrder === 'ASC' ? <ArrowDownAZ className='w-4'/> : <ArrowDownZA className='w-4'/>}
             <span>{sortOrder === 'ASC' ? 'Ascendente' : 'Descendente'}</span>
         </button>
     )
