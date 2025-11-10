@@ -11,6 +11,7 @@ Route.get('/getProducts/:id_tienda', SalesController.getProducts)
 Route.put('/updateSale/:id_venta', SalesController.updateSale); 
 Route.delete('/deleteSale/:id_venta', SalesController.deleteSale);
 Route.delete('/deleteDetail/:id_detalle', SalesController.deleteDetail);
-Route.get('/export/:id_tienda', SalesController.exportSales)
+Route.get('/export/:id_tienda', SalesController.exportSales);
+Route.get('/receipt/:id_venta', SalesController.getSaleReceipt);
 
 export default Route;

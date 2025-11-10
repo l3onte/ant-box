@@ -151,6 +151,7 @@ export default function Productos() {
         >
             <TableControls 
                 useSearch={true}
+                onSearch={(value) => setSearch(value)}
                 useSort={true}
                 onSort={(order) => setSortOrder(order)}
                 ExcelModule={'products'}

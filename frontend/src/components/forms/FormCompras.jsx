@@ -67,14 +67,17 @@ export default function FormCompras({ onClose, onSuccess, purchaseData, isEditin
         e.preventDefault();
         setLoading(true);
 
+        let win; // Abrimos la ventana aquí para que no la bloquee el navegador
         try {
             const payload = {
                 ...data,
                 nuevo_producto: isAddFormOpen ? newProduct : null
             };
 
+            let result;
+
             if (isEditing) {
-                await API.put(`/ant-box/purchases/updatePurchase/${purchaseData.id_compra}`, payload);
+                result = await API.put(`/ant-box/purchases/updatePurchase/${purchaseData.id_compra}`, payload);
                 Swal.fire({
                     icon: "success",
                     title: "Compra actualizada",
@@ -83,7 +86,7 @@ export default function FormCompras({ onClose, onSuccess, purchaseData, isEditin
                     showConfirmButton: false
                 });
             } else {
-                await API.post(`/ant-box/purchases/postPurchase/${store.id_tienda}`, payload);
+                result = await API.post(`/ant-box/purchases/postPurchase/${store.id_tienda}`, payload);
                 Swal.fire({
                     icon: "success",
                     title: "Compra registrada",
@@ -95,6 +98,23 @@ export default function FormCompras({ onClose, onSuccess, purchaseData, isEditin
 
             onSuccess?.();
             onClose?.();
+
+            const id_compra = result.data?.id_compra || purchaseData?.id_compra;
+            if (id_compra) {
+                try {
+                    const receipt = await API.get(`/ant-box/purchases/receipt/${id_compra}`);
+                    const win = window.open("", "_blank");
+                    openReceiptWindow(receipt.data, win);
+                } catch (err) {
+                    console.error("Error al generar recibo:", err);
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Compra guardada pero no se pudo generar el recibo",
+                        text: err.response?.data?.message || err.message
+                    });
+                }
+            }
+
         } catch (error) {
             Swal.fire({
                 icon: "error",
@@ -104,6 +124,59 @@ export default function FormCompras({ onClose, onSuccess, purchaseData, isEditin
         } finally {
             setLoading(false);
         }
+    };
+
+    const openReceiptWindow = (data, win) => {
+        const { compra, detalles } = data;
+
+        const html = `
+        <html>
+            <head>
+            <title>Recibo de Compra #${compra.id_compra}</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 20px; }
+                h2 { text-align: center; }
+                table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+                th { background-color: #f3f3f3; }
+                .total { text-align: right; font-weight: bold; margin-top: 20px; }
+            </style>
+            </head>
+            <body>
+            <h2>Recibo de Compra</h2>
+            <p><strong>ID Compra:</strong> ${compra.id_compra}</p>
+            <p><strong>Proveedor:</strong> ${compra.proveedor}</p>
+            <p><strong>Fecha:</strong> ${compra.fecha_compra}</p>
+
+            <table>
+                <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Precio Compra</th>
+                    <th>Subtotal</th>
+                </tr>
+                </thead>
+                <tbody>
+                ${detalles.map(d => `
+                    <tr>
+                    <td>${d.producto}</td>
+                    <td>${d.cantidad}</td>
+                    <td>${d.precio_compra}</td>
+                    <td>${(d.precio_compra * d.cantidad)}</td>
+                    </tr>
+                `).join("")}
+                </tbody>
+            </table>
+
+            <p class="total">Total: ${compra.total}</p>
+            <script>window.print();</script>
+            </body>
+        </html>
+        `;
+
+        win.document.write(html);
+        win.document.close();
     };
 
     return (
