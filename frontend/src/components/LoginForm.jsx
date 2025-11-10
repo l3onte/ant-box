@@ -35,7 +35,7 @@ export default function LoginForm() {
       setUser(user);
       localStorage.setItem('user', JSON.stringify(user));
     
-      const storeResponse = await API.get(`/ant-box/store/getStoreById/${user.id}`);
+      const storeResponse = await API.get(`/ant-box/store/getStoreByUser/${user.id}`);
       const storeData = storeResponse.data;
 
       setStore(storeData);

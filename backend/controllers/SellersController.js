@@ -95,7 +95,7 @@ const exportSellers = async (req, res) => {
         const { rows } = await SellersModel.getSellers(id_tienda, 1, 9999, '');
 
         const workbook = new ExcelJS.Workbook();
-        const worksheet = workbook.addWorksheet();
+        const worksheet = workbook.addWorksheet("Vendedores");
 
         worksheet.columns = [
             { header: 'id', key: 'id', width: 20 },

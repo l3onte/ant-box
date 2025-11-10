@@ -17,35 +17,35 @@
         "name": "Clientes",
         "icon": "Contact",
         "path": "/clientes",
-        "rolesAllowed": ["administrador", "vendedores"],
+        "rolesAllowed": ["administrador", "vendedor"],
         "category": "Menu Principal"
     },
     {
         "name": "Proveedores",
         "icon": "Briefcase",
         "path": "/proveedores",
-        "rolesAllowed": ["administrador", "vendedores"],
+        "rolesAllowed": ["administrador", "vendedor"],
         "category": "Menu Principal"
     },
     {
         "name": "Productos",
         "icon": "PackageSearch",
         "path": "/productos",
-        "rolesAllowed": ["administrador", "vendedores"],
+        "rolesAllowed": ["administrador", "vendedor"],
         "category": "Menu Principal"
     },
     {
         "name": "Ventas",
         "icon": "CreditCard",
         "path": "/ventas",
-        "rolesAllowed": ["administrador", "vendedores"],
+        "rolesAllowed": ["administrador", "vendedor"],
         "category": "Reportes"
     },
     {
         "name": "Compras",
         "icon": "ShoppingCart",
         "path": "/compras",
-        "rolesAllowed": ["administrador", "vendedores"],
+        "rolesAllowed": ["administrador", "vendedor"],
         "category": "Reportes"
     },
     {
@@ -59,21 +59,21 @@
         "name": "Inventario",
         "icon": "Archive",
         "path": "/inventario",
-        "rolesAllowed": ["administrador", "vendedores"],
+        "rolesAllowed": ["administrador", "vendedor"],
         "category": "Reportes"
     },
     {
         "name": "Ayuda",
         "icon": "Info",
         "path": "/ayuda",
-        "rolesAllowed": ["administrador", "vendedores"],
+        "rolesAllowed": ["administrador", "vendedor"],
         "category": "Configuracion"
     },
     {
         "name": "Configuracion",
         "icon": "Settings",
         "path": "/configuracion",
-        "rolesAllowed": ["administrador", "vendedores"],
+        "rolesAllowed": ["administrador", "vendedor"],
         "category": "Configuracion"
     }
 ]

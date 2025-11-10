@@ -77,7 +77,7 @@ CREATE TABLE Productos (
  precio_venta DECIMAL(10,2),
  stock INT NOT NULL,
  stock_minimo INT NOT NULL,
- precio_unitario DECIMAL(10,2) NOT NULL,
+ precio_unitario DECIMAL(10,2),
  id_proveedor INT,
  id_tienda INT NOT NULL,
 
@@ -90,6 +90,32 @@ CREATE TABLE Productos (
   ON DELETE CASCADE
   ON UPDATE CASCADE
 );
+
+SELECT 
+	id_producto,
+    nombre
+FROM Productos
+WHERE id_tienda = 1 AND id_proveedor = 5;
+
+DELIMITER //
+	CREATE TRIGGER trg_calcular_precio_venta
+    BEFORE INSERT ON Productos
+    FOR EACH ROW
+    BEGIN
+		SET NEW.precio_venta = NEW.precio_compra + (NEW.precio_compra * (NEW.porcentaje_ganancia / 100));
+        SET NEW.precio_unitario = NEW.precio_venta;
+	END //
+DELIMITER ;
+
+DELIMITER //
+	CREATE TRIGGER trg_actualizar_precio_venta
+    BEFORE UPDATE ON Productos
+    FOR EACH ROW
+    BEGIN 
+		SET NEW.precio_venta = NEW.precio_compra + (NEW.precio_compra * (NEW.porcentaje_ganancia / 100));
+        SET NEW.precio_unitario = NEW.precio_venta;
+    END //
+DELIMITER ;
 
 -- Tabla de Clientes
 CREATE TABLE Clientes (
@@ -175,3 +201,73 @@ CREATE TABLE Detalle_Compras (
   REFERENCES Productos(id_producto)
   ON DELETE RESTRICT
 );
+
+-- =======================
+-- INSERTS DE USUARIOS
+-- =======================
+INSERT INTO Usuarios (nombre, apellido, correo, username, password, rol) VALUES
+('Karla', 'Pérez', 'karla@antbox.com', 'karla01', '123456', 'vendedor'),
+('Luis', 'Gómez', 'luis@antbox.com', 'luis02', '123456', 'vendedor'),
+('Martha', 'Torres', 'martha@antbox.com', 'martha03', '123456', 'vendedor'),
+('Carlos', 'Santos', 'carlos@antbox.com', 'carlos04', '123456', 'vendedor');
+
+-- =======================
+-- INSERTS DE PROVEEDORES
+-- =======================
+INSERT INTO Proveedores (nombre, direccion, telefono, email, status, id_tienda) VALUES
+('Distribuidora Diana','Carretera Norte, Managua','+505 2250-1122','ventas@diana.com.ni','Activo',1),
+('Yummies Nicaragua S.A.','Carretera a Masaya Km 10','+505 2278-3344','info@yummies.com.ni','Activo',1),
+('Snacks Nica','Altamira, Managua','+505 2289-4422','contacto@snacksnica.com','Activo',1),
+('Comercial El Buen Precio','Mercado Oriental, Local 20','+505 8877-9900','contacto@elbuenprecio.com','Activo',1),
+('Distribuciones Tropical','Km 4 Carretera Sur, Managua','+505 8990-3344','ventas@tropical.com.ni','Activo',1),
+('Chivería El Rey','Bo. San Judas, Managua','+505 8655-6677','rey@chiveria.com.ni','Activo',1),
+('Importadora Delicias','Colonia Centroamérica, Managua','+505 8822-9911','ventas@delicias.com.ni','Activo',1),
+('Alimentos Nica S.A.','Reparto Schick, Managua','+505 8744-2200','pedidos@alimentosnica.com','Activo',1),
+('Variedades El Gallo','Mercado Iván Montenegro','+505 8899-2211','ventas@elgallo.ni','Activo',1),
+('Super Dulces','Barrio El Edén, Managua','+505 8811-7755','info@superdulces.com','Activo',1),
+('Distribuciones Campero','Carretera Vieja a León','+505 8333-4455','info@distcampero.com','Activo',1),
+('Proveedora Selecta','Altamira, Managua','+505 8666-3344','ventas@selecta.com.ni','Activo',1),
+('Dulces y Más S.A.','Edificio Comercial Metrocentro','+505 8990-1133','contacto@dulcesymas.com','Activo',1),
+('Mercadería Express','Col. Don Bosco, Managua','+505 8555-6677','express@mercaderia.com','Activo',1),
+('Abasto Managua','Km 5 Carretera Norte, Managua','+505 8988-2233','abasto@managua.com.ni','Activo',1);
+
+-- =======================
+-- INSERTS DE CLIENTES
+-- =======================
+INSERT INTO Clientes (nombre, direccion, telefono, email, id_tienda) VALUES
+('Juan López','Col. San Judas','+505 8877-2211','juanlopez@mail.com',1),
+('María Pérez','Reparto Schick','+505 8877-2212','mariaperez@mail.com',1),
+('Carlos Gómez','Altamira','+505 8877-2213','carlosgomez@mail.com',1),
+('Ana Torres','Villa Libertad','+505 8877-2214','anatorres@mail.com',1),
+('Luis Morales','Carretera Norte','+505 8877-2215','luismorales@mail.com',1),
+('Sofía Rivas','Los Robles','+505 8877-2216','sofiarivas@mail.com',1),
+('Pedro Martínez','Villa Venezuela','+505 8877-2217','pedromartinez@mail.com',1),
+('Rosa Castro','El Edén','+505 8877-2218','rosacastro@mail.com',1),
+('Javier López','Altamira','+505 8877-2219','javierlopez@mail.com',1),
+('Lucía Torres','Col. Miguel Gutiérrez','+505 8877-2220','luciatorres@mail.com',1),
+('Camila Ruiz','Reparto Schick','+505 8877-2221','camilaruiz@mail.com',1),
+('José García','Villa Flor','+505 8877-2222','josegarcia@mail.com',1),
+('Kevin Ortega','Altamira','+505 8877-2223','kevinortega@mail.com',1),
+('Martha Reyes','Carretera Sur','+505 8877-2224','marthareyes@mail.com',1),
+('Cristian Ramos','El Dorado','+505 8877-2225','cristianramos@mail.com',1);
+
+-- =======================
+-- INSERTS DE PRODUCTOS
+-- =======================
+INSERT INTO Productos (nombre, descripcion, precio_compra, porcentaje_ganancia, stock, stock_minimo, id_proveedor, id_tienda)
+VALUES
+('Churros Diana 50g','Snacks de maíz sabor original',5.00,30.00,100,10,1,1),
+('Tostones Diana 60g','Tostones salados crujientes',6.00,25.00,80,10,1,1),
+('Chivería Yummies Quesitos 40g','Snacks sabor a queso',4.50,35.00,120,15,2,1),
+('Papas Fritas Yummies 60g','Papas fritas saladas',7.00,30.00,90,10,2,1),
+('Tortillitas Nica 30g','Tostaditas de maíz',3.50,40.00,150,20,3,1),
+('Galletas ChocoRico','Galletas con relleno de chocolate',9.00,25.00,50,10,7,1),
+('Refresco Big Cola 600ml','Bebida gaseosa sabor cola',18.00,20.00,60,10,4,1),
+('Agua Selva 1L','Agua purificada embotellada',12.00,20.00,70,10,5,1),
+('Chocobananos Congelados','Postre congelado de banano con chocolate',10.00,25.00,40,10,8,1),
+('Dulces de Leche El Gallo','Dulces tradicionales nicaragüenses',8.00,30.00,100,15,9,1),
+('Gomitas Yummies 50g','Gomitas de frutas',5.50,35.00,90,10,2,1),
+('Maní Tostado Diana 80g','Maní con sal tostado',7.00,25.00,70,10,1,1),
+('Rosquillas Somoteñas','Rosquillas tradicionales de maíz',6.00,30.00,120,20,10,1),
+('Café Presto 200g','Café molido nicaragüense',45.00,20.00,40,5,11,1),
+('Galletas Rancheras','Galletas saladas',10.00,25.00,60,10,12,1);

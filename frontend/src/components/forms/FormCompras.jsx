@@ -25,7 +25,6 @@ export default function FormCompras({ onClose, onSuccess, purchaseData, isEditin
         descripcion: '',
         precio_compra: '',
         porcentaje_ganancia: '',
-        stock: '',
         stock_minimo: ''
     });
 
@@ -43,7 +42,7 @@ export default function FormCompras({ onClose, onSuccess, purchaseData, isEditin
 
     // Cargar proveedores
     useEffect(() => {
-        API.get(`/ant-box/suppliers/getSuppliers/${store.id_tienda}`)
+        API.get(`/ant-box/suppliers/getSuppliers/${store.id_tienda}?page=${1}&limit=${9999}`)
             .then(res => setProveedores(res?.data?.result || []))
             .catch(err => console.error(err.message));
     }, [store.id_tienda]);
@@ -229,7 +228,6 @@ export default function FormCompras({ onClose, onSuccess, purchaseData, isEditin
                 )}    
             </div>
 
-            {/* Subformulario para producto nuevo */}
             {isAddFormOpen && (
                 <div className="border-t border-gray-300 pt-2 mt-2">
                     <h3 className="font-semibold mb-1 text-gray-700">Nuevo Producto</h3>
@@ -245,15 +243,12 @@ export default function FormCompras({ onClose, onSuccess, purchaseData, isEditin
                     <label>Porcentaje de Ganancia</label>
                     <Input name="porcentaje_ganancia" value={newProduct.porcentaje_ganancia} onChange={handleNewProductChange} placeholder="15" />
                     
-                    <label>Stock</label>
-                    <Input type="number" name="stock" value={newProduct.stock} onChange={handleNewProductChange} placeholder="10" />
-                    
                     <label>Stock Mínimo</label>
                     <Input type="number" name="stock_minimo" value={newProduct.stock_minimo} onChange={handleNewProductChange} placeholder="3" />
                 </div>
             )}
 
-            {/* Campos comunes */}
+
             <label>Cantidad</label>
             <Input 
                 type="number"
@@ -263,7 +258,6 @@ export default function FormCompras({ onClose, onSuccess, purchaseData, isEditin
                 onChange={handleChange}
                 required
             />
-
             <label>Precio de compra</label>
             <Input
                 type="number"

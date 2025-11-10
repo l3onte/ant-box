@@ -15,6 +15,22 @@ const getStoreById = async (req, res) => {
     }
 }
 
+const getStoreByUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const store = await StoreModel.getStoreByUser(id);
+        if (!store) {
+        return res.status(404).json({ message: "Tienda no encontrada para este usuario." });
+        }
+
+        res.json(store);
+    } catch (error) {
+        console.error("Error en getStoreByUser:", error);
+        res.statusa(500).json({ message: "Error del servidor." });
+    }
+}
+
 export default {
-    getStoreById
+    getStoreById,
+    getStoreByUser
 }

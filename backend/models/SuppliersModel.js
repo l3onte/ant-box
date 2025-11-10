@@ -4,11 +4,12 @@ const Suppliers = {
     postSuppliers: async (id_tienda, supplierData) => {
         try {
             const { nombre, direccion, telefono, email, status } = supplierData; 
+            const supplierStatus = status || 'Activo';
 
             const [rows] = await db.query(`
                 INSERT INTO Proveedores (nombre, direccion, telefono, email, status, id_tienda)
                 VALUES (?, ?, ?, ?, ?, ?);
-            `, [nombre, direccion, telefono, email, status, id_tienda]);
+            `, [nombre, direccion, telefono, email, supplierStatus, id_tienda]);
 
             const supplierId = rows.insertId;
             

@@ -1,10 +1,13 @@
 import db from "../config/db.js";
 
 const InventoryModel = {
-    getInventory: async (id_tienda, page, limit, search = '', sort = 'ASC') => {
+    getInventory: async (id_tienda, page, limit, search = '', sort = 'ASC', stockMin = false) => {
         const offset = (page - 1) * limit;
         const searchFilter = `%${search}%`;
         const order = sort.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
+
+        let stockFilter = '';
+        if (stockMin) stockFilter = 'AND p.stock <= p.stock_minimo';
 
         try {
             const [rows] = await db.query(`
@@ -12,7 +15,7 @@ const InventoryModel = {
                     p.id_producto,
                     p.nombre,
                     p.descripcion,
-                    p.stock AS stock_actual,
+                    p.stock AS stock_real,  
                     p.stock_minimo,
                     p.precio_compra,
                     p.precio_venta,
@@ -20,9 +23,8 @@ const InventoryModel = {
                     prov.nombre AS proveedor,
                     COALESCE(dc.total_comprado, 0) AS total_comprado,
                     COALESCE(dv.total_vendido, 0) AS total_vendido,
-                    (p.stock + COALESCE(dc.total_comprado, 0) - COALESCE(dv.total_vendido, 0)) AS stock_real,
                     CASE 
-                        WHEN (p.stock + COALESCE(dc.total_comprado, 0) - COALESCE(dv.total_vendido, 0)) < p.stock_minimo THEN 'Bajo'
+                        WHEN p.stock < p.stock_minimo THEN 'Bajo'
                         ELSE 'OK'
                     END AS alerta_stock
                 FROM Productos p
@@ -38,6 +40,7 @@ const InventoryModel = {
                     GROUP BY id_producto
                 ) dv ON dv.id_producto = p.id_producto
                 WHERE p.id_tienda = ?
+                    ${stockFilter}
                     AND (
                         p.id_producto LIKE ?
                         OR p.nombre LIKE ?

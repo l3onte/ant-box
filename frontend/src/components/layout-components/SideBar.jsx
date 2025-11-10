@@ -1,4 +1,5 @@
 import { useStore } from "../../services/storeContext.jsx";
+import { useUser } from "../../services/userContext.jsx";
 import { Box  } from 'lucide-react';
 import SideBarItems from "./SideBarItems.jsx";
 import itemsJSON from "../../data/sideBarItems.json";
@@ -6,11 +7,14 @@ import SwitchButton from "./SwitchButton.jsx";
 
 export default function SideBar() {
     const { store } = useStore();
+    const { user } = useUser();
 
     const groupedItems = itemsJSON.reduce((acc, item) => {
         if (!acc[item.category])  acc[item.category] = [];
 
-        acc[item.category].push(item);
+        if (item.rolesAllowed.includes(user?.rol)) {
+            acc[item.category].push(item);
+        }
         return acc;
     }, {});
 
@@ -24,7 +28,7 @@ export default function SideBar() {
                             {store?.nombre || 'Sin tienda'}
                         </span>
 
-                        <span className="text-[9px] text-gray-400">Administrador</span>
+                        <span className="text-[9px] text-gray-400">{user.rol}</span>
                     </div>
                 </div>
 
