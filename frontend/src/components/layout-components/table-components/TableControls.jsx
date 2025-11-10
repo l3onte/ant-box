@@ -3,6 +3,7 @@ import FilterButton from "./FilterButton"
 import SortButton from "./SortButton"
 import PaginationSelect from "./PaginationSelect"
 import ExcelButton from "./ExcelButton"
+import MinExistButton from "./MinExistButton"
 import { useStore } from "../../../services/storeContext";
 
 export default function TableControls({ 
@@ -17,7 +18,9 @@ export default function TableControls({
         ExcelModule,
         ExcelName,
         route,
-        onLimitChange
+        onLimitChange,
+        useMinStock = false,
+        onStockMinToggle
 }) {
     const { store } = useStore();
 
@@ -43,6 +46,10 @@ export default function TableControls({
                     route={route}
                     onChange={onLimitChange}
                 />
+
+                {useMinStock && (
+                    <MinExistButton onClick={() => onStockMinToggle && onStockMinToggle()}/>
+                )}
 
                 {useFilter && (
                     <FilterButton 

@@ -132,17 +132,19 @@ export default function FormSupplier({ onClose, onSuccess,  supplierDataEdit, is
                 />
             </label>
 
-            <label className="flex flex-col">
-                Rol
-                <select 
-                    name="status"
-                    value={supplierData.status}
-                    onChange={handleChange}
-                    className="bg-gray-100/70 w-70 shadow-sm placeholder-gray-500 px-4 py-2 rounded transition">
-                    <option value="Activo">Activo</option>
-                    <option value="Inactivo">Inactivo</option>
-                </select>
-            </label>
+            {isEditing && (
+                <label className="flex flex-col">
+                    Estado
+                    <select 
+                        name="status"
+                        value={supplierData.status}
+                        onChange={handleChange}
+                        className="bg-gray-100/70 w-70 shadow-sm placeholder-gray-500 px-4 py-2 rounded transition">
+                        <option value="Activo">Activo</option>
+                        <option value="Inactivo">Inactivo</option>
+                    </select>
+                </label>
+            )}
 
             <Button 
                 name="Guardar" 

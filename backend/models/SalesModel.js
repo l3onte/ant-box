@@ -16,7 +16,7 @@ const SalesModel = {
 
             for (const { id_producto, cantidad } of productos) {
                 const [result] = await connection.query(`
-                    SELECT precio_unitario
+                    SELECT stock, precio_unitario, nombre
                     FROM Productos
                     WHERE id_producto = ? AND id_tienda = ?;
                 `, [id_producto, id_tienda]);
@@ -24,7 +24,12 @@ const SalesModel = {
                 if (result.length === 0) 
                     throw new Error(`El producto con ID ${id_producto} no existe o no pertenece a esta tienda.`);
 
-                const { precio_unitario } = result[0];
+                const { stock, precio_unitario, nombre } = result[0];
+
+                if (stock < cantidad) {
+                    throw new Error(`Stock insuficiente para ${nombre}. Stock disponible: ${stock}, Cantidad solicitada: ${cantidad}.`);
+                }
+
                 totalVenta += precio_unitario * cantidad;
             }
 
@@ -40,6 +45,12 @@ const SalesModel = {
                     INSERT INTO Detalle_Ventas (id_venta, id_producto, cantidad)
                     VALUES (?,?,?);
                 `, [id_venta, id_producto, cantidad]);
+
+                await connection.query(`
+                    UPDATE Productos
+                    SET stock = stock - ?
+                    WHERE id_producto = ?;                    
+                `, [cantidad, id_producto]);
             }
 
             await connection.commit();
@@ -156,27 +167,72 @@ const SalesModel = {
         try {
             await connection.beginTransaction();
 
-            const {
-                fecha_venta,
-                id_cliente,
-                id_producto,
-                cantidad,
-                precio_unitario
-            } = saleInfo;
+            const { fecha_venta, id_cliente, productos } = saleInfo;
 
-            const total = precio_unitario * cantidad;
+            // Obtener la venta anterior para revertir stock
+            const [oldDetails] = await connection.query(`
+                SELECT id_producto, cantidad 
+                FROM Detalle_Ventas 
+                WHERE id_venta = ?
+            `, [id_venta]);
 
+            // Revertir stock de la venta anterior
+            for (const { id_producto, cantidad } of oldDetails) {
+                await connection.query(`
+                    UPDATE Productos 
+                    SET stock = stock + ?
+                    WHERE id_producto = ?
+                `, [cantidad, id_producto]);
+            }
+
+            let totalVenta = 0;
+
+            // Validar stock para los nuevos productos
+            for (const { id_producto, cantidad } of productos) {
+                const [result] = await connection.query(`
+                    SELECT stock, precio_unitario, nombre
+                    FROM Productos
+                    WHERE id_producto = ?;
+                `, [id_producto]);
+
+                if (result.length === 0) 
+                    throw new Error(`El producto con ID ${id_producto} no existe.`);
+
+                const { stock, precio_unitario, nombre } = result[0];
+                
+                if (stock < cantidad) {
+                    throw new Error(`Stock insuficiente para ${nombre}. Stock disponible: ${stock}, Cantidad solicitada: ${cantidad}`);
+                }
+
+                totalVenta += precio_unitario * cantidad;
+            }
+
+            // Actualizar la venta
             await connection.query(`
                 UPDATE Ventas
                 SET fecha_venta = ?, id_cliente = ?, total = ?
                 WHERE id_venta = ?;
-            `, [fecha_venta, id_cliente, total, id_venta]);
+            `, [fecha_venta, id_cliente, totalVenta, id_venta]);
 
+            // Eliminar detalles antiguos
             await connection.query(`
-                UPDATE Detalle_Ventas
-                SET id_producto = ?, cantidad = ?, precio_unitario = ?
-                WHERE id_venta = ?;
-            `, [id_producto, cantidad, precio_unitario, id_venta]);
+                DELETE FROM Detalle_Ventas WHERE id_venta = ?;
+            `, [id_venta]);
+
+            // Insertar nuevos detalles y actualizar stock
+            for (const { id_producto, cantidad } of productos) {
+                await connection.query(`
+                    INSERT INTO Detalle_Ventas (id_venta, id_producto, cantidad)
+                    VALUES (?,?,?);
+                `, [id_venta, id_producto, cantidad]);
+
+                // Actualizar stock con los nuevos valores
+                await connection.query(`
+                    UPDATE Productos 
+                    SET stock = stock - ?
+                    WHERE id_producto = ?;
+                `, [cantidad, id_producto]);
+            }
 
             await connection.commit();
             return { message: 'Venta actualizada correctamente.' };
@@ -190,34 +246,80 @@ const SalesModel = {
     },
 
     deleteSale: async (id_venta) => {
+        const connection = await db.getConnection();
         try {
-            const [result] = await db.query(`
+            await connection.beginTransaction();
+
+            // Primero: Obtener los detalles para revertir el stock
+            const [detalles] = await connection.query(`
+                SELECT id_producto, cantidad 
+                FROM Detalle_Ventas 
+                WHERE id_venta = ?
+            `, [id_venta]);
+
+            // Revertir el stock
+            for (const { id_producto, cantidad } of detalles) {
+                await connection.query(`
+                    UPDATE Productos 
+                    SET stock = stock + ?
+                    WHERE id_producto = ?
+                `, [cantidad, id_producto]);
+            }
+
+            // Luego eliminar la venta
+            const [result] = await connection.query(`
                 DELETE FROM Ventas WHERE id_venta = ?;
             `, [id_venta]);
 
             if (result.affectedRows === 0) 
-                throw new Error('No se econtró la venta a eliminar.');
+                throw new Error('No se encontró la venta a eliminar.');
 
+            await connection.commit();
             return { message: 'Venta eliminada con éxito.' }; 
         } catch (error) {
+            await connection.rollback();
             console.error('Error en deleteSale: ', error.message);
             throw error;
+        } finally {
+            connection.release();
         }
     },
 
-    deleteDatail: async (id_detail) => {
+    deleteDetail: async (id_detail) => {
+        const connection = await db.getConnection();
         try {
-            const [result] = await db.query(`
+            await connection.beginTransaction();
+
+            // Primero obtener el detalle para revertir stock
+            const [detail] = await connection.query(`
+                SELECT id_producto, cantidad 
+                FROM Detalle_Ventas 
+                WHERE id_detalle = ?
+            `, [id_detail]);
+
+            if (detail.length === 0)
+                throw new Error('No se encontró el detalle a eliminar.');
+
+            // Revertir stock
+            await connection.query(`
+                UPDATE Productos 
+                SET stock = stock + ?
+                WHERE id_producto = ?
+            `, [detail[0].cantidad, detail[0].id_producto]);
+
+            // Luego eliminar el detalle
+            const [result] = await connection.query(`
                 DELETE FROM Detalle_Ventas WHERE id_detalle = ?;
             `, [id_detail]);
 
-            if (result.affectedRows === 0)
-                throw new Error('No se encontro el detalle a elimiar.');
-            
+            await connection.commit();
             return { message: 'Detalle eliminado.' }
         } catch (error) {
-            console.error('Error en deleteDatail: ', error.message);
+            await connection.rollback();
+            console.error('Error en deleteDetail: ', error.message);
             throw error;
+        } finally {
+            connection.release();
         }
     },
 

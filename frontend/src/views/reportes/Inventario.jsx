@@ -16,6 +16,7 @@ export default function Inventario() {
     const [inventory, setInventory] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [sortOrder, setSortOrder] = useState('ASC');
+    const [stockMinOnly, setStockMinOnly] = useState(false);
 
     const moduleInfo = {
         title: 'Inventario',
@@ -23,7 +24,7 @@ export default function Inventario() {
     }
     
     const columns = [
-        { header: 'nombre', accessor: 'nombre'},
+        { header: 'producto', accessor: 'nombre'},
         { header: 'descripción', accessor: 'descripcion' },
         { header: 'comprado', accessor: 'total_comprado' },
         { header: 'vendido', accessor: 'total_vendido' },
@@ -55,12 +56,12 @@ export default function Inventario() {
     ]
 
     useEffect(() => {
-        API.get(`/ant-box/inventory/getInventory/${store.id_tienda}?page=${page}&limit=${limit}&search=${searchTerm}&sort=${sortOrder}`)
+        API.get(`/ant-box/inventory/getInventory/${store.id_tienda}?page=${page}&limit=${limit}&search=${searchTerm}&sort=${sortOrder}&stockMin=${stockMinOnly}`)
             .then((response) => {
                 setInventory(response?.data?.rows);
                 setTotal(response?.data?.total);
             })
-    }, [store.id_tienda, page, limit, searchTerm, sortOrder])
+    }, [store.id_tienda, page, limit, searchTerm, sortOrder, stockMinOnly])
 
     return (
         <ModuleLayout
@@ -75,6 +76,8 @@ export default function Inventario() {
                 ExcelName={'Inventario'}
                 route={'inventory/getInventory'}
                 onLimitChange={(newLimit) => setLimit(newLimit)}
+                useMinStock={true}
+                onStockMinToggle={() => setStockMinOnly(prev => !prev)}
             />
             <Table
             columns={columns}

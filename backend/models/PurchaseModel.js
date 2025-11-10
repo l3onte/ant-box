@@ -67,6 +67,7 @@ const PurchaseModel = {
             } = data;
 
             let productoId = id_producto;
+            let esProductoNuevo = false;
 
             if (!id_producto && nuevo_producto) {
                 const [resultProducto] = await conn.query(`
@@ -80,12 +81,13 @@ const PurchaseModel = {
                     nuevo_producto.descripcion,
                     nuevo_producto.precio_compra,
                     nuevo_producto.porcentaje_ganancia,
-                    nuevo_producto.stock,
+                    cantidad,
                     nuevo_producto.stock_minimo,
                     id_proveedor,
                     id_tienda
                 ]);
                 productoId = resultProducto.insertId;
+                esProductoNuevo = true;
             }
 
             const totalCompra = cantidad * precio_compra;
@@ -102,12 +104,14 @@ const PurchaseModel = {
                 VALUES (?, ?, ?, ?)
             `, [id_compra, productoId, cantidad, precio_compra]);
 
-            await conn.query(`
-                UPDATE Productos 
-                SET stock = stock + ?,
-                    precio_compra = ? 
-                WHERE id_producto = ?
-            `, [cantidad, precio_compra, productoId]);
+            if (!esProductoNuevo) {
+                await conn.query(`
+                    UPDATE Productos
+                    SET stock = stock + ?
+                        precio_compra = ?
+                    WHERE id_producto = ?;
+                `, [cantidad, precio_compra, productoId]);
+            }
 
             await conn.commit();
             return { message: 'Compra registrada correctamente', id_compra };
