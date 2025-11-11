@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Search, User, ChevronDown, ChevronUp, LogOut } from "lucide-react"
 import { useUser } from "../../services/userContext"
+import { Link } from "react-router-dom";
 
 export default function Header() {
     const { user } = useUser();
@@ -52,10 +53,10 @@ export default function Header() {
 
                 {dropIsDown && (
                     <div className="absolute right-0 mt-3 bg-white  rounded shadow-md text-[12px] z-10 cursor-pointer">
-                        <button className="w-full px-4 py-2 hover:bg-gray-100 flex items-center gap-2 text-gray-700 cursor-pointer">
+                        <Link to={'/'} className="w-full px-4 py-2 hover:bg-gray-100 flex items-center gap-2 text-gray-700 cursor-pointer">
                             <LogOut className="w-6" />
                             Cerrar sesión
-                        </button>
+                        </Link>
                     </div>
                 )}
             </div>
