@@ -2,7 +2,7 @@ import { useState } from "react"
 import Button from "../forms-components/Button"
 import Modal from "../Modal";
 
-export default function ModuleLayout({ moduleInfo, children, modalContent }) {
+export default function ModuleLayout({ moduleInfo, children, modalContent, modalWidth }) {
     const [isAddModalOpen, setIsAddModal] = useState(false);
 
     return (
@@ -29,6 +29,7 @@ export default function ModuleLayout({ moduleInfo, children, modalContent }) {
 
             {isAddModalOpen && (
                 <Modal 
+                    width={modalWidth}
                     onClose={() => setIsAddModal(false)} 
                     modalTitle={moduleInfo.buttonName}
                 >

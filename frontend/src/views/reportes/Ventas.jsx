@@ -87,6 +87,7 @@ export default function Ventas() {
                     onSuccess={() => setRefresh(prev => !prev)}
                 />
             )}
+            modalWidth={'520px'}
         >
             <TableControls 
                 onSearch={(value) => setSearchTerm(value)}

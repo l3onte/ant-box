@@ -3,40 +3,37 @@ import Input from "../forms-components/Input"
 import { useState, useEffect } from "react"
 import API from "../../services/API.js"
 import { useStore } from "../../services/storeContext.jsx"
-import { PackagePlus } from 'lucide-react';
+import { PackagePlus, PlusCircle, Trash2 } from 'lucide-react';
 import Swal from "sweetalert2";
 
 export default function FormCompras({ onClose, onSuccess, purchaseData, isEditing = false }) {
     const { store } = useStore();
     const [proveedores, setProveedores] = useState([]);
     const [products, setProducts] = useState([]);
-    const [isAddFormOpen, setIsAddFormOpen] = useState(false);
     const [loading, setLoading] = useState(false);
 
-    const [data, setData] = useState({
-        id_proveedor: '',
-        id_producto: '',
-        cantidad: '',
-        precio_compra: ''
-    });
+    // Estado para múltiples productos
+    const [productos, setProductos] = useState([{ 
+        id_producto: "", 
+        cantidad: 1, 
+        precio_compra: "",
+        nuevo_producto: null
+    }]);
 
-    const [newProduct, setNewProduct] = useState({
-        nombre: '',
-        descripcion: '',
-        precio_compra: '',
-        porcentaje_ganancia: '',
-        stock_minimo: ''
-    });
+    const [idProveedor, setIdProveedor] = useState('');
 
     // Cargar datos al editar
     useEffect(() => {
-        if (purchaseData) {
-            setData({
-                id_proveedor: purchaseData.id_proveedor || '',
-                id_producto: purchaseData.id_producto || '',
-                cantidad: purchaseData.cantidad || '',
-                precio_compra: purchaseData.precio_compra || ''
-            });
+        if (purchaseData && purchaseData.detalles) {
+            setIdProveedor(purchaseData.id_proveedor);
+            // Convertir los detalles a la estructura de múltiples productos
+            const detallesFormateados = purchaseData.detalles.map(detalle => ({
+                id_producto: detalle.id_producto,
+                cantidad: detalle.cantidad,
+                precio_compra: detalle.precio_compra,
+                nuevo_producto: null
+            }));
+            setProductos(detallesFormateados);
         }
     }, [purchaseData]);
 
@@ -49,28 +46,81 @@ export default function FormCompras({ onClose, onSuccess, purchaseData, isEditin
 
     // Cargar productos
     useEffect(() => {
-        API.get(`/ant-box/products/getProducts/${store.id_tienda}`)
+        API.get(`/ant-box/products/getProducts/${store.id_tienda}?page=${1}&limit=${9999}`)
             .then(res => setProducts(res?.data?.rows || []))
             .catch(err => console.error(err.message));
     }, [store.id_tienda]);
 
-    const handleChange = (e) => {
-        setData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    const handleAddProduct = () => {
+        setProductos([...productos, { 
+            id_producto: "", 
+            cantidad: 1, 
+            precio_compra: "",
+            nuevo_producto: null
+        }]);
     };
 
-    const handleNewProductChange = (e) => {
-        setNewProduct(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    const handleRemoveProduct = (index) => {
+        if (productos.length > 1) {
+            setProductos(productos.filter((_, i) => i !== index));
+        }
+    };
+
+    const handleChangeProduct = (index, field, value) => {
+        const updated = [...productos];
+        updated[index][field] = value;
+        setProductos(updated);
+    };
+
+    const handleChangeNewProduct = (index, field, value) => {
+        const updated = [...productos];
+        if (!updated[index].nuevo_producto) {
+            updated[index].nuevo_producto = {
+                nombre: '',
+                descripcion: '',
+                precio_compra: '',
+                porcentaje_ganancia: '',
+                stock_minimo: ''
+            };
+        }
+        updated[index].nuevo_producto[field] = value;
+        // Sincronizar precio_compra
+        if (field === 'precio_compra') {
+            updated[index].precio_compra = value;
+        }
+        setProductos(updated);
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
 
-        let win; // Abrimos la ventana aquí para que no la bloquee el navegador
         try {
+            // Validaciones
+            if (!idProveedor) {
+                Swal.fire("Error", "Debe seleccionar un proveedor.", "error");
+                return;
+            }
+
+            if (productos.some(p => (!p.id_producto && !p.nuevo_producto?.nombre) || !p.cantidad || !p.precio_compra)) {
+                Swal.fire("Error", "Todos los productos deben estar completos.", "error");
+                return;
+            }
+
             const payload = {
-                ...data,
-                nuevo_producto: isAddFormOpen ? newProduct : null
+                id_proveedor: idProveedor,
+                productos: productos.map(producto => ({
+                    id_producto: producto.id_producto,
+                    cantidad: Number(producto.cantidad),
+                    precio_compra: Number(producto.precio_compra),
+                    nuevo_producto: producto.id_producto ? null : {
+                        nombre: producto.nuevo_producto?.nombre,
+                        descripcion: producto.nuevo_producto?.descripcion || '',
+                        precio_compra: Number(producto.precio_compra),
+                        porcentaje_ganancia: Number(producto.nuevo_producto?.porcentaje_ganancia) || 0,
+                        stock_minimo: Number(producto.nuevo_producto?.stock_minimo) || 0
+                    }
+                }))
             };
 
             let result;
@@ -115,6 +165,7 @@ export default function FormCompras({ onClose, onSuccess, purchaseData, isEditin
             }
 
         } catch (error) {
+            console.error("Error completo:", error);
             Swal.fire({
                 icon: "error",
                 title: "Error al guardar",
@@ -162,7 +213,7 @@ export default function FormCompras({ onClose, onSuccess, purchaseData, isEditin
                     <td>${d.producto}</td>
                     <td>${d.cantidad}</td>
                     <td>${d.precio_compra}</td>
-                    <td>${(d.precio_compra * d.cantidad)}</td>
+                    <td>${(d.cantidad * d.precio_compra).toFixed(2)}</td>
                     </tr>
                 `).join("")}
                 </tbody>
@@ -186,9 +237,8 @@ export default function FormCompras({ onClose, onSuccess, purchaseData, isEditin
             {/* Select de Proveedor */}
             <label className="text-sm font-semibold">Proveedor</label>
             <select
-                name="id_proveedor"
-                value={data.id_proveedor}
-                onChange={handleChange}
+                value={idProveedor}
+                onChange={(e) => setIdProveedor(e.target.value)}
                 className="bg-gray-100/70 w-full shadow-sm placeholder-gray-500 px-4 py-2 rounded transition"
                 required
             >
@@ -200,73 +250,107 @@ export default function FormCompras({ onClose, onSuccess, purchaseData, isEditin
                 ))}
             </select>
             
-            {/* Select de Producto */}
-            <label className="text-sm font-semibold">Producto</label>
-            <div className="flex items-center gap-2 relative">
-                <select 
-                    name="id_producto"
-                    value={data.id_producto}
-                    onChange={handleChange}
-                    disabled={isAddFormOpen}
-                    className="bg-gray-100/70 w-full shadow-sm placeholder-gray-500 px-4 py-2 rounded transition"
-                    required
+            {/* Lista de Productos */}
+            <div className="flex flex-col gap-2 mt-2">
+                {productos.map((producto, index) => (
+                    <div key={index} className="border p-2 rounded">
+                        <div className="flex items-center gap-2 relative">
+                            <select 
+                                value={producto.id_producto}
+                                onChange={(e) => handleChangeProduct(index, 'id_producto', e.target.value)}
+                                className="bg-gray-100/70 w-full shadow-sm placeholder-gray-500 px-4 py-2 rounded transition"
+                                
+                            >
+                                <option value="">Seleccione un producto</option>
+                                {products.map((p) => (
+                                    <option key={p.id_producto} value={p.id_producto}>
+                                        {p.nombre}
+                                    </option>
+                                ))}
+                            </select>
+
+                            {productos.length > 1 && (
+                                <Trash2
+                                    onClick={() => handleRemoveProduct(index)}
+                                    className="text-red-500 cursor-pointer hover:text-red-700"
+                                    size={16}
+                                />
+                            )}
+                        </div>
+
+                        {/* Si no selecciona un producto existente, mostrar formulario para nuevo producto */}
+                        {!producto.id_producto && (
+                            <div className="border-t border-gray-300 pt-2 mt-2">
+                                <h3 className="font-semibold mb-1 text-gray-700">Nuevo Producto</h3>
+                                <label>Nombre</label>
+                                <Input 
+                                    value={producto.nuevo_producto?.nombre || ''} 
+                                    onChange={(e) => handleChangeNewProduct(index, 'nombre', e.target.value)} 
+                                    placeholder="Ej. Jabón líquido" 
+                                    required
+                                />
+                                
+                                <label>Descripción</label>
+                                <Input 
+                                    value={producto.nuevo_producto?.descripcion || ''} 
+                                    onChange={(e) => handleChangeNewProduct(index, 'descripcion', e.target.value)} 
+                                    placeholder="Ej. 500ml" 
+                                />
+                                
+                                <label>Porcentaje de Ganancia</label>
+                                <Input 
+                                    type="number"
+                                    value={producto.nuevo_producto?.porcentaje_ganancia || ''} 
+                                    onChange={(e) => handleChangeNewProduct(index, 'porcentaje_ganancia', e.target.value)} 
+                                    placeholder="15" 
+                                />
+                                
+                                <label>Stock Mínimo</label>
+                                <Input 
+                                    type="number"
+                                    value={producto.nuevo_producto?.stock_minimo || ''} 
+                                    onChange={(e) => handleChangeNewProduct(index, 'stock_minimo', e.target.value)} 
+                                    placeholder="3" 
+                                />
+                            </div>
+                        )}
+
+                        <div className="flex gap-2 mt-2">
+                            <div className="flex-1">
+                                <label>Cantidad</label>
+                                <Input 
+                                    type="number"
+                                    placeholder="2"
+                                    value={producto.cantidad}
+                                    onChange={(e) => handleChangeProduct(index, 'cantidad', e.target.value)}
+                                    required
+                                    min="1"
+                                />
+                            </div>
+                            <div className="flex-1">
+                                <label>Precio de compra</label>
+                                <Input
+                                    type="number"
+                                    placeholder="100.00"
+                                    value={producto.precio_compra}
+                                    onChange={(e) => handleChangeProduct(index, 'precio_compra', e.target.value)}
+                                    required
+                                    step="0.01"
+                                    min="0"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                ))}
+
+                <button 
+                    type="button"
+                    onClick={handleAddProduct}
+                    className="flex items-center justify-start gap-1 text-blue-600 text-xs mt-1"
                 >
-                    <option value="">Seleccione un producto</option>
-                    {products.map((p) => (
-                        <option key={p.id_producto} value={p.id_producto}>
-                            {p.nombre}
-                        </option>
-                    ))}
-                </select>
-
-                {/* Botón para agregar nuevo producto */}
-                {!isEditing && (
-                    <PackagePlus 
-                        onClick={() => setIsAddFormOpen(!isAddFormOpen)}
-                        className="absolute right-5 size-4 hover:text-gray-500 cursor-pointer" 
-                    />
-                )}    
+                    <PlusCircle size={14}/> Agregar producto
+                </button>
             </div>
-
-            {isAddFormOpen && (
-                <div className="border-t border-gray-300 pt-2 mt-2">
-                    <h3 className="font-semibold mb-1 text-gray-700">Nuevo Producto</h3>
-                    <label>Nombre</label>
-                    <Input name="nombre" value={newProduct.nombre} onChange={handleNewProductChange} placeholder="Ej. Jabón líquido" />
-                    
-                    <label>Descripción</label>
-                    <Input name="descripcion" value={newProduct.descripcion} onChange={handleNewProductChange} placeholder="Ej. 500ml" />
-                    
-                    <label>Precio de Compra</label>
-                    <Input type="number" name="precio_compra" value={newProduct.precio_compra} onChange={handleNewProductChange} placeholder="100" />
-                    
-                    <label>Porcentaje de Ganancia</label>
-                    <Input name="porcentaje_ganancia" value={newProduct.porcentaje_ganancia} onChange={handleNewProductChange} placeholder="15" />
-                    
-                    <label>Stock Mínimo</label>
-                    <Input type="number" name="stock_minimo" value={newProduct.stock_minimo} onChange={handleNewProductChange} placeholder="3" />
-                </div>
-            )}
-
-
-            <label>Cantidad</label>
-            <Input 
-                type="number"
-                placeholder="2"
-                name="cantidad"
-                value={data.cantidad}
-                onChange={handleChange}
-                required
-            />
-            <label>Precio de compra</label>
-            <Input
-                type="number"
-                placeholder="100.00"
-                name="precio_compra"
-                value={data.precio_compra}
-                onChange={handleChange}
-                required
-            />
 
             <Button 
                 name={loading ? "Guardando..." : isEditing ? "Actualizar" : "Guardar"} 

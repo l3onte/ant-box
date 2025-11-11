@@ -9,6 +9,7 @@ import { Edit, Trash2 } from "lucide-react";
 import FormCompras from "../../components/forms/FormCompras.jsx";
 import Modal from "../../components/Modal.jsx";
 import Swal from "sweetalert2";
+import ExpandedPurchaseDetails from "../../components/layout-components/table-components/ExpandedPurchaseDetails";
 
 export default function Compras() {
     const { store } = useStore();
@@ -65,22 +66,20 @@ export default function Compras() {
         }
     };
 
+    const fetchPurchaseDetails = async (id_compra) => {
+        try {
+            const response = await API.get(`/ant-box/purchases/receipt/${id_compra}`);
+            return response.data.detalles || [];
+        } catch (error) {
+            console.error('Error fetching purchase details:', error);
+            return [];
+        }
+    };
+
     const columns = [
         { header: 'ID', accessor: 'id_compra' },
         { header: 'Fecha de Compra', accessor: 'fecha_compra' },
         { header: 'Proveedor', accessor: 'proveedor' },
-        { header: 'Producto', accessor: 'producto' },
-        { header: 'Cantidad', accessor: 'cantidad' },
-        { 
-            header: 'Precio de Compra', 
-            accessor: 'precio_compra',
-            Cell: (row) => (
-                <div>
-                    <span>{store.moneda === 'NIO' ? 'C$' : '$'}</span>
-                    <span>{row.precio_compra}</span> 
-                </div>
-            )
-        },
         { 
             header: 'Total', 
             accessor: 'total',
@@ -90,6 +89,13 @@ export default function Compras() {
                     <span>{row.total}</span>
                 </div>
             ) 
+        },
+        {
+            header: 'Productos',
+            accessor: 'cantidad_productos',
+            Cell: (row) => (
+                <span>{row.detalles?.length || 0} productos</span>
+            )
         },
         {
             header: '',
@@ -116,13 +122,22 @@ export default function Compras() {
         }
     ];
 
+    const renderExpandedRow = (row) => {
+        return (
+            <ExpandedPurchaseDetails 
+                id_compra={row.id_compra}
+                fetchPurchaseDetails={fetchPurchaseDetails}
+            />
+        );
+    };
+
     useEffect(() => {
         API.get(`/ant-box/purchases/getPurchases/${store.id_tienda}?page=${page}&limit=${limit}&search=${searchTerm}&startDate=${startDate}&endDate=${endDate}&sort=${sortOrder}`)
             .then((response) => {
                 setPurchases(response?.data?.rows);
                 setTotal(response?.data?.total);
             })
-            .catch(error => console.error(error)); 
+            .catch(error => console.error('Error al obtener compras:', error)); 
     }, [store.id_tienda, page, limit, searchTerm, startDate, endDate, refresh, sortOrder]);
 
     return (
@@ -134,6 +149,7 @@ export default function Compras() {
                     onSuccess={() => setRefresh(prev => !prev)}
                 />
             )}    
+            modalWidth={'700px'}
         >
             <TableControls 
                 useSearch={true} 
@@ -152,7 +168,9 @@ export default function Compras() {
             />
             <Table 
                 columns={columns} 
-                data={purchases} 
+                data={purchases}
+                expandable
+                renderExpandedRow={renderExpandedRow}
             />
             <Pagination 
                 page={page}
@@ -165,6 +183,7 @@ export default function Compras() {
                 <Modal 
                     onClose={() => setEditModal(false)}
                     modalTitle={"Editar Compra"}
+                    width={'700px'}
                 >
                     <FormCompras
                         onClose={() => setEditModal(false)}  
