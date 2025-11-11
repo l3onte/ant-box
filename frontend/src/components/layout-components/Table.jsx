@@ -25,34 +25,43 @@ export default function Table({ columns, data, expandable = false, renderExpande
         </thead>
 
         <tbody className="bg-gray-50">
-          {data.map((row, rowIndex) => (
-            <Fragment key={rowIndex}>
-              <tr
-                className={`hover:bg-gray-100 transition duration-300 ${
-                  expandable ? "cursor-pointer" : ""
-                }`}
-                onClick={() => expandable && toggleExpand(rowIndex)}
-              >
-                {columns.map((col) => (
-                  <td
-                    key={col.accessor}
-                    className="text-left text-gray-700 px-10 py-2"
-                  >
-                    {col.Cell ? col.Cell(row) : row[col.accessor]}
-                  </td>
-                ))}
+            {data.length === 0 ? (
+              <tr>
+                <td colSpan={columns.length} className="text-center text-gray-500 py-4">
+                  Sin datos
+                </td>
               </tr>
+            ) : (
+              data.map((row, rowIndex) => (
+                <Fragment key={rowIndex}>
+                  <tr
+                    className={`hover:bg-gray-100 transition duration-300 ${
+                      expandable ? "cursor-pointer" : ""
+                    }`}
+                    onClick={() => expandable && toggleExpand(rowIndex)}
+                  >
+                    {columns.map((col) => (
+                      <td
+                        key={col.accessor}
+                        className="text-left text-gray-700 px-10 py-2"
+                      >
+                        {col.Cell ? col.Cell(row) : row[col.accessor]}
+                      </td>
+                    ))}
+                  </tr>
 
-              {expandable && expandedRow === rowIndex && renderExpandedRow && (
-                <tr className="bg-white border-t border-gray-200">
-                  <td colSpan={columns.length} className="p-4">
-                    {renderExpandedRow(row)}
-                  </td>
-                </tr>
-              )}
-            </Fragment>
-          ))}
+                  {expandable && expandedRow === rowIndex && renderExpandedRow && (
+                    <tr className="bg-white border-t border-gray-200">
+                      <td colSpan={columns.length} className="p-4">
+                        {renderExpandedRow(row)}
+                      </td>
+                    </tr>
+                  )}
+                </Fragment>
+              ))
+          )}
         </tbody>
+
       </table>
     </div>
   );
