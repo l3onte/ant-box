@@ -13,7 +13,7 @@ export default function FormSupplier({ onClose, onSuccess,  supplierDataEdit, is
         direccion: '',
         telefono: '',
         email: '',
-        status: '',
+        status: 'Activo',
         id_proveedor: ''
     });
 
